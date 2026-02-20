@@ -367,11 +367,15 @@
 
 <script>
     const defaultGames = [
-        { title: "Fallout 3", cover: "https://upload.wikimedia.org/wikipedia/pt/2/23/Fallout_3_capa.png", platform: "PC", score: "9.5", date: "05/02/2026", review: "Escolhas morais pesadas logo de cara. Que RPG fantástico." },
-        { title: "Venetica", cover: "https://upload.wikimedia.org/wikipedia/en/2/28/Venetica_Cover.jpg", platform: "PC", score: "7.5", date: "15/01/2026", review: "Mecânicas antigas, mas o enredo me prendeu." },
-        { title: "Elden Ring", cover: "https://image.api.playstation.com/vulcan/ap/rnd/202110/2000/phvVT0qZfcRms5qDAk0SI3CM.png", platform: "Xbox Series X", score: "10", date: "10/12/2025", review: "Obra-prima. O melhor design de mundo aberto já feito." },
-        { title: "Hollow Knight", cover: "https://upload.wikimedia.org/wikipedia/pt/0/05/Hollow_Knight_capa.png", platform: "PC", score: "9.8", date: "20/11/2025", review: "Level design impecável. Metroidvania no seu auge." }
-    ];
+    {
+        "title": "Minecruft",
+        "cover": "https://store-images.s-microsoft.com/image/apps.808.14492077886571533.be42f4bd-887b-4430-8ed0-622341b4d2b0.c8274c53-105e-478b-9f4b-41b8088210a3?q=90&w=512&h=768&mode=crop&format=jpg&background=%23FFFFFF",
+        "platform": "PC",
+        "score": "10",
+        "date": "2026",
+        "review": ""
+    }
+];
 
     let games = JSON.parse(localStorage.getItem('nerisCollection')) || defaultGames;
     let displayGames = [...games]; 
@@ -507,3 +511,4 @@
 
 </body>
 </html>
+
