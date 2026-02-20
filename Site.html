@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogos Finalizados</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --wood-dark: #0a0705;
+            --wood-back: #140d09;
+            --wood-floor: #332014;
+            --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --case-depth: 45px;
+            --modal-dvd-depth: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #030303;
+            background-image: radial-gradient(circle at 50% 0%, #1a100a, #030303 100%);
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #fff;
+        }
+
+        /* CABEÇALHO */
+        header { text-align: center; padding: 40px 20px 20px; position: relative; z-index: 50; }
+        h1 {
+            font-family: 'Cinzel', serif; font-size: clamp(2rem, 5vw, 4rem); font-weight: 800;
+            color: var(--gold); text-transform: uppercase; letter-spacing: 4px;
+            text-shadow: 0px 8px 15px rgba(0,0,0,1), 0 0 20px var(--gold-glow);
+            cursor: pointer; display: inline-block; margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        h1:hover { text-shadow: 0px 10px 20px rgba(0,0,0,1), 0 0 35px var(--gold-glow); }
+
+        .controls-bar {
+            background: linear-gradient(to right, transparent, rgba(30, 20, 10, 0.8), transparent);
+            padding: 15px; display: flex; justify-content: center; gap: 15px; align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 40px; flex-wrap: wrap;
+        }
+        .controls-bar label { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #aaa; }
+        .controls-bar select {
+            background: #111; color: var(--gold); border: 1px solid var(--gold);
+            padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-weight: bold;
+            border-radius: 4px; cursor: pointer; outline: none; box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: 0.3s;
+        }
+        .controls-bar select:hover { background: #222; box-shadow: 0 0 15px var(--gold-glow); }
+
+        /* A ESTANTE VOLUMÉTRICA */
+        .library-container {
+            width: 100%; max-width: 1500px; margin: 0 auto;
+            display: flex; flex-direction: column; gap: 0; padding: 0 20px 100px;
+            border-left: clamp(10px, 3vw, 35px) solid #140a05; 
+            border-right: clamp(10px, 3vw, 35px) solid #140a05; 
+            border-top: clamp(10px, 3vw, 35px) solid #140a05;
+            box-shadow: 0 50px 100px rgba(0,0,0,1), inset 0 0 60px rgba(0,0,0,0.9);
+            background: var(--wood-dark); border-radius: 8px;
+        }
+
+        .shelf-row {
+            position: relative; width: 100%; min-height: 400px;
+            display: flex; justify-content: center; align-items: flex-end;
+            padding-bottom: 25px; border-bottom: 45px solid #1c1109;
+            box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8);
+            background: linear-gradient(to bottom, #050302, var(--wood-back));
+            perspective: 1400px; z-index: 1;
+        }
+
+        .shelf-row::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
+            background: linear-gradient(to top, var(--wood-floor), #0a0604);
+            transform-origin: bottom; transform: rotateX(65deg);
+            box-shadow: inset 0 30px 60px rgba(0,0,0,0.9); z-index: 0;
+            border-top: 2px solid rgba(255,255,255,0.03);
+        }
+
+        .shelf-content {
+            display: flex; gap: 45px; position: relative; z-index: 10;
+            transform-style: preserve-3d; padding: 0 40px; flex-wrap: wrap; justify-content: center;
+        }
+
+        /* CAIXA DA PRATELEIRA */
+        .game-case-wrapper {
+            width: 190px; height: 270px;
+            perspective: 1200px; cursor: pointer; position: relative; margin-top: 30px;
+        }
+        
+        .case-shadow {
+            position: absolute; bottom: -15px; left: -20px; width: 140%; height: 40px;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, transparent 70%);
+            transform: rotateX(70deg) translateZ(-20px);
+            z-index: -1; transition: 0.4s ease; opacity: 0.8;
+        }
+        .game-case-wrapper:hover .case-shadow { transform: rotateX(70deg) translateZ(-20px) scale(1.1) translateX(10px); opacity: 1; }
+
+        .game-case {
+            width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            transform-origin: left center; z-index: 2;
+        }
+
+        .game-case-wrapper:hover .game-case { transform: rotateY(35deg) translateZ(30px) translateY(-10px); }
+
+        .case-face {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 3px 8px 8px 3px;
+        }
+
+        .case-front {
+            transform: translateZ(calc(var(--case-depth) / 2));
+            background: #000; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 2px 0 5px rgba(255,255,255,0.1);
+        }
+        .case-front img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .case-front::after {
+            content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%;
+            background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.5) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.2) 60%, transparent 80%);
+            transition: left 0.7s ease; mix-blend-mode: overlay; pointer-events: none;
+        }
+        .game-case-wrapper:hover .case-front::after { left: 150%; }
+
+        .case-side {
+            width: var(--case-depth); height: 100%;
+            transform: rotateY(-90deg) translateZ(calc(var(--case-depth) / 2));
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: inset -10px 0 20px rgba(0,0,0,0.9);
+            background-color: #111; 
+        }
+        .case-top {
+            width: 100%; height: var(--case-depth); background: #1a1a1a;
+            transform: rotateX(90deg) translateZ(calc(var(--case-depth) / 2));
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* SELO DE PLATAFORMA NA CAIXA */
+        .platform-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.85); border: 1px solid var(--gold);
+            color: var(--gold); font-size: 0.7rem; padding: 4px 8px;
+            border-radius: 4px; font-weight: bold; z-index: 20;
+            text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.9); backdrop-filter: blur(5px);
+        }
+
+        /* === MODAL & DVD GIGANTE === */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1f1f1f, #0a0a0a);
+            width: 1100px; max-width: 95%; height: 600px; border-radius: 12px;
+            border: 1px solid #333; box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 50px rgba(0,0,0,0.8);
+            display: flex; position: relative;
+            transform: scale(0.9) translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); opacity: 1; }
+
+        .wax-seal {
+            position: absolute; top: 35px; right: 35px; width: 140px; height: 140px;
+            background: radial-gradient(circle at 35% 35%, #e63946, #b00000, #5c0000);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            color: #ffe8e0; font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 800;
+            transform: rotate(-15deg) scale(0); z-index: 50; letter-spacing: 1px;
+            box-shadow: inset 0 0 15px rgba(50,0,0,0.9), inset 0 0 0 5px rgba(255,100,100,0.3), 0 15px 30px rgba(0,0,0,0.8);
+            border: 2px solid #540000; text-shadow: 1px 2px 3px rgba(0,0,0,0.9);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s;
+        }
+        .modal-overlay.active .wax-seal { transform: rotate(-15deg) scale(1); }
+        .wax-seal::before {
+            content: ''; position: absolute; width: 112%; height: 112%;
+            border-radius: 40% 60% 55% 45% / 55% 45% 60% 40%;
+            background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(130,0,0,0.8) 100%);
+            border: 2px solid rgba(80,0,0,0.5); filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5));
+        }
+
+        .modal-image-container {
+            width: 45%; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent);
+            border-right: 1px solid #222; position: relative; perspective: 1500px;
+        }
+        
+        .modal-dvd-case {
+            width: 280px; height: 400px; position: relative; transform-style: preserve-3d;
+            animation: modalFloat 7s ease-in-out infinite; filter: drop-shadow(-30px 40px 30px rgba(0,0,0,0.9));
+        }
+
+        @keyframes modalFloat {
+            0% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); }
+            50% { transform: translateY(-20px) rotateY(10deg) rotateX(-5deg); }
+            100% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); }
+        }
+
+        .dvd-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 4px 10px 10px 4px; }
+        .dvd-front {
+            transform: translateZ(calc(var(--modal-dvd-depth) / 2)); background: #000; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.3); box-shadow: inset 3px 0 10px rgba(255,255,255,0.2);
+        }
+        .dvd-front img { width: 100%; height: 100%; object-fit: cover; }
+        .dvd-front::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(125deg, transparent 30%, rgba(255,255,255,0.2) 45%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.1) 55%, transparent 70%);
+            mix-blend-mode: screen; pointer-events: none;
+        }
+        .dvd-side {
+            width: var(--modal-dvd-depth); height: 100%;
+            transform: rotateY(-90deg) translateZ(calc(var(--modal-dvd-depth) / 2));
+            background-color: #111; border: 1px solid rgba(255,255,255,0.15); box-shadow: inset -15px 0 30px rgba(0,0,0,1);
+        }
+
+        .modal-info { width: 55%; padding: 60px; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .anim-text { opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+        .modal-overlay.active .anim-text { opacity: 1; transform: translateY(0); }
+        .modal-overlay.active .delay-1 { transition-delay: 0.2s; }
+        .modal-overlay.active .delay-2 { transition-delay: 0.4s; }
+        .modal-overlay.active .delay-3 { transition-delay: 0.6s; }
+        .modal-overlay.active .delay-4 { transition-delay: 0.8s; }
+
+        .modal-title-display {
+            font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 700; color: #fff;
+            margin-bottom: 25px; text-shadow: 0 5px 10px rgba(0,0,0,0.8);
+            border-bottom: 2px solid #333; padding-bottom: 15px; line-height: 1.2;
+        }
+        .modal-score-title { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+        .modal-score-wrapper { position: relative; display: inline-block; margin-bottom: 20px; }
+        .modal-score-wrapper::before {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 150px; height: 150px; background: radial-gradient(circle, var(--gold-glow), transparent 70%);
+            z-index: -1; animation: pulseGlow 4s infinite;
+        }
+        @keyframes pulseGlow { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
+        .modal-score-value { font-family: 'Cinzel', serif; font-size: clamp(4rem, 8vw, 6rem); color: var(--gold); line-height: 1; text-shadow: 0 10px 30px rgba(0,0,0,0.9); display: inline-block; }
+        .modal-platform { display: inline-block; background: #222; border: 1px solid var(--gold); color: var(--gold); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;}
+        .modal-date { font-size: 1.1rem; color: #ccc; margin-bottom: 20px; font-weight: bold; }
+        .modal-desc { font-size: 1.1rem; line-height: 1.6; color: #bbb; border-left: 3px solid var(--gold); padding-left: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 0 8px 8px 0;}
+
+        .close-btn {
+            position: absolute; top: 15px; left: 15px;
+            background: rgba(0,0,0,0.5); border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%;
+            font-size: 1.2rem; color: #aaa; cursor: pointer; z-index: 20; transition: 0.3s;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .close-btn:hover { background: var(--gold); color: #000; transform: scale(1.1); box-shadow: 0 0 20px var(--gold-glow); border-color: var(--gold); }
+
+        /* PAINEL ADMIN */
+        #admin-panel {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #0a0a0a; border-top: 2px solid var(--gold); padding: 25px; z-index: 2000;
+            box-shadow: 0 -15px 50px rgba(0,0,0,0.9); max-height: 50vh; overflow-y: auto;
+        }
+        .admin-controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;}
+        .admin-btn {
+            background: var(--gold); color: #000; border: none; padding: 10px 20px;
+            font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Montserrat', sans-serif;
+            transition: 0.2s; text-transform: uppercase; font-size: 0.8rem;
+        }
+        .admin-btn.danger { background: #e63946; color: #fff; }
+        .admin-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        #add-form { display: none; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
+        #add-form input, #add-form select { padding: 10px; background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: 'Montserrat'; }
+        .delete-btn { 
+            position: absolute; top: -15px; right: -15px; background: #e63946; color: white; border: 2px solid #fff; 
+            border-radius: 50%; width: 35px; height: 35px; font-weight: bold; font-size: 1.2rem; cursor: pointer; 
+            display: none; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.8); transition: 0.2s;
+        }
+        .delete-btn:hover { transform: scale(1.2); }
+
+        /* === RESPONSIVIDADE (MOBILE E TABLETS) === */
+        @media (max-width: 900px) {
+            .modal-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
+            .modal-image-container { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; }
+            .modal-dvd-case { width: 200px; height: 280px; }
+            .modal-info { width: 100%; padding: 30px 20px; }
+            .wax-seal { top: 15px; right: 15px; width: 100px; height: 100px; font-size: 0.9rem; }
+            .shelf-row { height: auto; padding-top: 20px; }
+        }
+        @media (max-width: 600px) {
+            .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; }
+            .case-side { width: 30px; transform: rotateY(-90deg) translateZ(15px); }
+            .case-front { transform: translateZ(15px); }
+            .case-top { height: 30px; transform: rotateX(90deg) translateZ(15px); }
+            :root { --case-depth: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 id="main-title">Jogos Finalizados</h1>
+    <div class="controls-bar">
+        <label for="sort-select">Organizar estante:</label>
+        <select id="sort-select" onchange="handleSort()">
+            <option value="recent">Mais Recentes Adicionados</option>
+            <option value="score">Maior Nota</option>
+            <option value="az">A - Z</option>
+        </select>
+    </div>
+</header>
+
+<div class="library-container" id="library"></div>
+
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">✖</button>
+        <div class="wax-seal">FINALIZADO</div>
+        
+        <div class="modal-image-container">
+            <div class="modal-dvd-case">
+                <div class="dvd-face dvd-front"><img id="m-img" src="" alt="Capa"></div>
+                <div class="dvd-face dvd-side" id="m-side"></div>
+            </div>
+        </div>
+        
+        <div class="modal-info">
+            <div class="modal-title-display anim-text delay-1" id="m-title-display">Título</div>
+            <div class="anim-text delay-2">
+                <div class="modal-platform" id="m-platform">Plataforma</div>
+                <div style="clear: both;"></div>
+                <div class="modal-score-title">Avaliação Final</div>
+                <div class="modal-score-wrapper">
+                    <div class="modal-score-value"><span id="m-score"></span>/10</div>
+                </div>
+            </div>
+            <p class="modal-date anim-text delay-3">Data do Zeramento: <span style="color: var(--gold);" id="m-date"></span></p>
+            <p class="modal-desc anim-text delay-4">"<span id="m-desc"></span>"</p>
+        </div>
+    </div>
+</div>
+
+<div id="admin-panel">
+    <div class="admin-controls">
+        <span style="color: var(--gold); font-weight: bold; font-family: 'Cinzel'; font-size: 1rem; margin-right: 10px;">MODO DEUS ATIVO</span>
+        <button class="admin-btn" onclick="toggleAddForm()">+ Novo Jogo</button>
+        <button class="admin-btn" onclick="toggleDeleteMode()" id="del-mode-btn">Deletar Capas</button>
+        <button class="admin-btn danger" onclick="exportData()">💾 Exportar para o GitHub</button>
+        <button class="admin-btn" onclick="logoutAdmin()" style="background: #333; color: #fff;">Sair</button>
+    </div>
+    <div id="add-form">
+        <input type="text" id="i-title" placeholder="Nome do Jogo" required>
+        <input type="text" id="i-cover" placeholder="Link da Imagem (Capa)" required>
+        <select id="i-platform">
+            <option value="PC">PC</option>
+            <option value="Xbox Series X">Xbox Series X</option>
+            <option value="Meta Quest 3">Meta Quest 3</option>
+            <option value="Jogo de Tabuleiro">Jogo de Tabuleiro</option>
+        </select>
+        <input type="number" id="i-score" placeholder="Nota (ex: 9.5)" step="0.1" required>
+        <input type="text" id="i-date" placeholder="Data (DD/MM/AAAA)" required>
+        <input type="text" id="i-desc" placeholder="Review/Comentário Curto" style="width: 300px;" required>
+        <button class="admin-btn" onclick="saveNewGame()">Salvar Jogo</button>
+    </div>
+</div>
+
+<script>
+    const defaultGames = [
+        { title: "Fallout 3", cover: "https://upload.wikimedia.org/wikipedia/pt/2/23/Fallout_3_capa.png", platform: "PC", score: "9.5", date: "05/02/2026", review: "Escolhas morais pesadas logo de cara. Que RPG fantástico." },
+        { title: "Venetica", cover: "https://upload.wikimedia.org/wikipedia/en/2/28/Venetica_Cover.jpg", platform: "PC", score: "7.5", date: "15/01/2026", review: "Mecânicas antigas, mas o enredo me prendeu." },
+        { title: "Elden Ring", cover: "https://image.api.playstation.com/vulcan/ap/rnd/202110/2000/phvVT0qZfcRms5qDAk0SI3CM.png", platform: "Xbox Series X", score: "10", date: "10/12/2025", review: "Obra-prima. O melhor design de mundo aberto já feito." },
+        { title: "Hollow Knight", cover: "https://upload.wikimedia.org/wikipedia/pt/0/05/Hollow_Knight_capa.png", platform: "PC", score: "9.8", date: "20/11/2025", review: "Level design impecável. Metroidvania no seu auge." }
+    ];
+
+    let games = JSON.parse(localStorage.getItem('nerisCollection')) || defaultGames;
+    let displayGames = [...games]; 
+    let isAdmin = false; let deleteMode = false;
+
+    function handleSort() {
+        const sortType = document.getElementById('sort-select').value;
+        if (sortType === 'recent') displayGames = [...games];
+        else if (sortType === 'score') displayGames.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+        else if (sortType === 'az') displayGames.sort((a, b) => a.title.localeCompare(b.title));
+        renderLibrary();
+    }
+
+    function renderLibrary() {
+        const library = document.getElementById('library');
+        library.innerHTML = ''; 
+        let shelfRow, shelfContent;
+        
+        const isMobile = window.innerWidth <= 600;
+        const itemsPerShelf = isMobile ? 3 : 6; // Ajusta limite na estante se for celular
+
+        displayGames.forEach((game, index) => {
+            if (index % itemsPerShelf === 0) {
+                shelfRow = document.createElement('div'); shelfRow.className = 'shelf-row';
+                shelfContent = document.createElement('div'); shelfContent.className = 'shelf-content';
+                shelfRow.appendChild(shelfContent); library.appendChild(shelfRow);
+            }
+
+            const wrapper = document.createElement('div'); wrapper.className = 'game-case-wrapper';
+            const shadow = document.createElement('div'); shadow.className = 'case-shadow'; wrapper.appendChild(shadow);
+
+            // Selo da Plataforma
+            const platformBadge = document.createElement('div'); platformBadge.className = 'platform-badge';
+            platformBadge.innerText = game.platform || "PC";
+            wrapper.appendChild(platformBadge);
+
+            const delBtn = document.createElement('button'); delBtn.className = 'delete-btn'; delBtn.innerText = 'X';
+            const realIndex = games.findIndex(g => g.title === game.title); 
+            delBtn.onclick = (e) => { e.stopPropagation(); deleteGame(realIndex); };
+            if(isAdmin && deleteMode) delBtn.style.display = 'block';
+
+            wrapper.onclick = () => { if(!deleteMode) openModal(game); };
+
+            const gameCase = document.createElement('div'); gameCase.className = 'game-case';
+            const front = document.createElement('div'); front.className = 'case-face case-front';
+            const img = document.createElement('img'); img.src = game.cover; front.appendChild(img);
+
+            const side = document.createElement('div'); side.className = 'case-face case-side';
+            side.style.backgroundImage = `url(${game.cover})`; side.style.backgroundSize = 'cover'; side.style.backgroundPosition = 'left center'; 
+
+            const top = document.createElement('div'); top.className = 'case-face case-top';
+
+            gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top);
+            wrapper.appendChild(delBtn); wrapper.appendChild(gameCase); shelfContent.appendChild(wrapper);
+        });
+    }
+
+    const modal = document.getElementById('modal');
+    function openModal(game) {
+        document.getElementById('m-img').src = game.cover;
+        const modalSide = document.getElementById('m-side');
+        modalSide.style.backgroundImage = `url(${game.cover})`; modalSide.style.backgroundSize = 'cover'; modalSide.style.backgroundPosition = 'left center';
+        document.getElementById('m-title-display').innerText = game.title;
+        document.getElementById('m-platform').innerText = game.platform || "PC";
+        document.getElementById('m-score').innerText = game.score;
+        document.getElementById('m-date').innerText = game.date;
+        document.getElementById('m-desc').innerText = game.review;
+        modal.classList.add('active');
+    }
+    
+    function closeModal() { modal.classList.remove('active'); }
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    let clicks = 0;
+    document.getElementById('main-title').addEventListener('click', () => {
+        clicks++;
+        if(clicks === 3) {
+            clicks = 0;
+            const password = prompt("Modo Deus. Senha:");
+            if(password === "nerisadmin") {
+                isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; renderLibrary(); 
+            }
+        }
+        setTimeout(() => clicks = 0, 2000);
+    });
+
+    function toggleAddForm() {
+        const form = document.getElementById('add-form'); form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function toggleDeleteMode() {
+        deleteMode = !deleteMode;
+        const btn = document.getElementById('del-mode-btn');
+        btn.innerText = deleteMode ? "Cancelar Exclusão" : "Deletar Capas";
+        btn.style.background = deleteMode ? "#e63946" : "var(--gold)"; btn.style.color = deleteMode ? "#fff" : "#000";
+        renderLibrary();
+    }
+
+    function saveNewGame() {
+        const title = document.getElementById('i-title').value; const cover = document.getElementById('i-cover').value;
+        const platform = document.getElementById('i-platform').value;
+        const score = document.getElementById('i-score').value; const date = document.getElementById('i-date').value;
+        const review = document.getElementById('i-desc').value;
+
+        if(!title || !cover) return alert("Preencha título e capa!");
+        games.unshift({ title, cover, platform, score, date, review });
+        localStorage.setItem('nerisCollection', JSON.stringify(games));
+        
+        document.getElementById('i-title').value = ''; document.getElementById('i-cover').value = '';
+        document.getElementById('i-score').value = ''; document.getElementById('i-date').value = ''; document.getElementById('i-desc').value = '';
+        toggleAddForm(); handleSort(); 
+    }
+
+    function deleteGame(index) {
+        if(confirm("Expulsar esse jogo da estante?")) {
+            games.splice(index, 1); localStorage.setItem('nerisCollection', JSON.stringify(games)); handleSort();
+        }
+    }
+
+    function logoutAdmin() {
+        isAdmin = false; deleteMode = false;
+        document.getElementById('admin-panel').style.display = 'none'; renderLibrary();
+    }
+
+    function exportData() {
+        const dataStr = "const defaultGames = " + JSON.stringify(games, null, 4) + ";";
+        navigator.clipboard.writeText(dataStr).then(() => alert("✅ SUCESSO! Dados copiados.\n\nAbra o GitHub, vá no seu arquivo index.html, clique no Lápis (Editar) e substitua a parte do 'const defaultGames = [...]' pelo que você acabou de copiar. Depois clique em Commit changes.")).catch(() => alert("Erro ao copiar. Aperte F12."));
+    }
+
+    window.addEventListener('resize', renderLibrary); // Re-renderiza se mudar o tamanho da tela
+    handleSort();
+</script>
+
+</body>
+</html>
