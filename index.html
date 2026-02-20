@@ -17,6 +17,7 @@
             --gold-glow: rgba(212, 175, 55, 0.4);
             --case-depth: 45px;
             --modal-dvd-depth: 60px;
+            --led-color: #00e5ff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,10 +37,15 @@
             font-family: 'Cinzel', serif; font-size: clamp(2rem, 5vw, 4rem); font-weight: 800;
             color: var(--gold); text-transform: uppercase; letter-spacing: 4px;
             text-shadow: 0px 8px 15px rgba(0,0,0,1), 0 0 20px var(--gold-glow);
-            cursor: pointer; display: inline-block; margin-bottom: 20px;
+            cursor: pointer; display: inline-block; margin-bottom: 5px;
             transition: 0.3s;
         }
         h1:hover { text-shadow: 0px 10px 20px rgba(0,0,0,1), 0 0 35px var(--gold-glow); }
+        
+        .subtitle {
+            color: #888; font-family: 'Montserrat', sans-serif; font-size: 1rem;
+            font-style: italic; margin-bottom: 25px; letter-spacing: 1px;
+        }
 
         .controls-bar {
             background: linear-gradient(to right, transparent, rgba(30, 20, 10, 0.8), transparent);
@@ -54,6 +60,17 @@
             border-radius: 4px; cursor: pointer; outline: none; box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: 0.3s;
         }
         .controls-bar select:hover { background: #222; box-shadow: 0 0 15px var(--gold-glow); }
+
+        .btn-led {
+            background: #111; color: #fff; border: 1px solid #555;
+            padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-weight: bold;
+            border-radius: 4px; cursor: pointer; outline: none; transition: 0.3s;
+        }
+        .btn-led:hover { background: #222; }
+        .btn-led.active {
+            border-color: var(--led-color); color: var(--led-color); box-shadow: 0 0 15px var(--led-color);
+            text-shadow: 0 0 5px var(--led-color);
+        }
 
         /* A ESTANTE VOLUMÉTRICA */
         .library-container {
@@ -72,7 +89,7 @@
             padding-bottom: 25px; border-bottom: 45px solid #1c1109;
             box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8);
             background: linear-gradient(to bottom, #050302, var(--wood-back));
-            perspective: 1400px; z-index: 1;
+            perspective: 1400px; z-index: 1; transition: box-shadow 0.4s;
         }
 
         .shelf-row::before {
@@ -80,8 +97,18 @@
             background: linear-gradient(to top, var(--wood-floor), #0a0604);
             transform-origin: bottom; transform: rotateX(65deg);
             box-shadow: inset 0 30px 60px rgba(0,0,0,0.9); z-index: 0;
-            border-top: 2px solid rgba(255,255,255,0.03);
+            border-top: 2px solid rgba(255,255,255,0.03); transition: box-shadow 0.4s;
         }
+
+        .shelf-row.led-active {
+            box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8), inset 0 25px 60px -20px var(--led-color);
+        }
+        .shelf-row.led-active::after {
+            content: ''; position: absolute; top: -2px; left: 0; width: 100%; height: 6px;
+            background: var(--led-color); box-shadow: 0 5px 30px 10px var(--led-color);
+            opacity: 0.65; z-index: 5; pointer-events: none;
+        }
+        .shelf-row.led-active::before { box-shadow: inset 0 30px 60px rgba(0,0,0,0.9), inset 0 60px 80px -40px var(--led-color); }
 
         .shelf-content {
             display: flex; gap: 45px; position: relative; z-index: 10;
@@ -94,6 +121,11 @@
             perspective: 1200px; cursor: pointer; position: relative; margin-top: 30px;
         }
         
+        /* A cápsula de animação que flutua independentemente do hover */
+        .game-case-animator {
+            width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
+        }
+
         .case-shadow {
             position: absolute; bottom: -15px; left: -20px; width: 140%; height: 40px;
             background: radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, transparent 70%);
@@ -104,24 +136,21 @@
 
         .game-case {
             width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
-            transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.1);
-            transform-origin: left center; z-index: 2;
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1); /* Sem box-shadow aqui para evitar o quadrado invisivel */
+            transform-origin: center center; z-index: 2;
         }
-
         .game-case-wrapper:hover .game-case { transform: rotateY(35deg) translateZ(30px) translateY(-10px); }
 
         .case-face {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             backface-visibility: hidden; border-radius: 3px 8px 8px 3px;
         }
-
         .case-front {
-            transform: translateZ(calc(var(--case-depth) / 2));
-            background: #000; overflow: hidden;
+            transform: translateZ(calc(var(--case-depth) / 2)); background: #000; overflow: hidden;
             border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 2px 0 5px rgba(255,255,255,0.1);
+            transition: box-shadow 0.4s;
         }
         .case-front img { width: 100%; height: 100%; object-fit: cover; }
-        
         .case-front::after {
             content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%;
             background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.5) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.2) 60%, transparent 80%);
@@ -132,96 +161,125 @@
         .case-side {
             width: var(--case-depth); height: 100%;
             transform: rotateY(-90deg) translateZ(calc(var(--case-depth) / 2));
-            border: 1px solid rgba(255,255,255,0.1); box-shadow: inset -10px 0 20px rgba(0,0,0,0.9);
-            background-color: #111; 
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: inset -5px 0 15px rgba(0,0,0,0.8); background-color: #111; 
+            transition: box-shadow 0.4s;
         }
         .case-top {
             width: 100%; height: var(--case-depth); background: #1a1a1a;
-            transform: rotateX(90deg) translateZ(calc(var(--case-depth) / 2));
-            border-top: 1px solid rgba(255,255,255,0.2);
+            transform: rotateX(90deg) translateZ(calc(var(--case-depth) / 2)); border-top: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* SELO DE PLATAFORMA NA CAIXA */
+        /* O REFLEXO 3D REAL (Imune a bugs de box-reflect) */
+        .game-reflection {
+            position: absolute; top: 100%; left: 0; width: 100%; height: 100%;
+            transform-origin: top;
+            transform: rotateX(180deg) translateZ(calc(var(--case-depth) / 2));
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 40%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 40%);
+            opacity: 0.6; pointer-events: none; border-radius: 3px 8px 8px 3px;
+        }
+        .game-reflection img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px 8px 8px 3px; }
+
         .platform-badge {
-            position: absolute; top: 10px; right: 10px;
-            background: rgba(0,0,0,0.85); border: 1px solid var(--gold);
-            color: var(--gold); font-size: 0.7rem; padding: 4px 8px;
-            border-radius: 4px; font-weight: bold; z-index: 20;
-            text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.9); backdrop-filter: blur(5px);
+            position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+            background: rgba(10, 5, 2, 0.85); border: 1px solid rgba(212, 175, 55, 0.3);
+            color: #aaa; font-size: 0.65rem; padding: 3px 12px; border-radius: 12px; font-weight: bold; z-index: 5;
+            text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.8); 
+            white-space: nowrap; transition: 0.3s ease; pointer-events: none;
+        }
+        .game-case-wrapper:hover .platform-badge { color: var(--gold); border-color: var(--gold); background: rgba(10, 5, 2, 1); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
+
+        /* =========================================================
+           EFEITO OBRA-PRIMA (SEM LAG & SEM BUG DE QUADRADO INVISÍVEL)
+           ========================================================= */
+        
+        /* A cápsula inteira fica levitando sozinha sem brigar com o hover */
+        .masterpiece .game-case-animator {
+            animation: floatMasterpiece 4s ease-in-out infinite;
+        }
+        @keyframes floatMasterpiece {
+            0%, 100% { transform: translateY(-5px); }
+            50% { transform: translateY(-18px); }
         }
 
-        /* === MODAL & DVD GIGANTE === */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px);
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000;
+        /* O Hover do Jogo 10 aplica um Zoom maior e rotação, e soma com a levitação! */
+        .masterpiece:hover .game-case {
+            transform: scale(1.05) rotateY(35deg) translateZ(40px);
         }
+
+        /* O brilho dourado (box-shadow) agora fica apenas nas faces (frente e lado), evitando o bug do Chrome */
+        .masterpiece .case-front, .masterpiece .case-side {
+            box-shadow: inset 2px 0 5px rgba(255,255,255,0.1), 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+        .masterpiece:hover .case-front, .masterpiece:hover .case-side {
+            box-shadow: inset 2px 0 5px rgba(255,255,255,0.3), 0 0 40px rgba(212, 175, 55, 0.9);
+        }
+
+        /* A sombra no chão acompanha o pulsar da levitação */
+        .masterpiece .case-shadow {
+            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.6) 0%, transparent 70%);
+            animation: shadowPulse 4s ease-in-out infinite;
+        }
+        @keyframes shadowPulse {
+            0%, 100% { transform: rotateX(70deg) translateZ(-20px) scale(1.1); opacity: 0.8; }
+            50% { transform: rotateX(70deg) translateZ(-20px) scale(0.9); opacity: 0.5; }
+        }
+        /* No hover, o brilho da sombra intensifica */
+        .masterpiece:hover .case-shadow {
+            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.9) 0%, transparent 70%);
+        }
+
+        .masterpiece .platform-badge {
+            background: linear-gradient(135deg, #1a1400, #403000); border: 1px solid var(--gold);
+            color: var(--gold); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.6);
+        }
+        .masterpiece .platform-badge::before { content: '👑 '; }
+
+        /* === MODAL E DVD GIGANTE === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-
-        .modal-content {
-            background: linear-gradient(145deg, #1f1f1f, #0a0a0a);
-            width: 1100px; max-width: 95%; height: 600px; border-radius: 12px;
-            border: 1px solid #333; box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 50px rgba(0,0,0,0.8);
-            display: flex; position: relative;
-            transform: scale(0.9) translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            overflow: hidden;
-        }
+        .modal-content { background: linear-gradient(145deg, #1f1f1f, #0a0a0a); width: 1100px; max-width: 95%; height: 600px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 50px rgba(0,0,0,0.8); display: flex; position: relative; transform: scale(0.9) translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
         .modal-overlay.active .modal-content { transform: scale(1) translateY(0); opacity: 1; }
+        
+        /* MODAL VIP (Apenas o visual destacado) */
+        .modal-masterpiece .modal-content {
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 120px rgba(212, 175, 55, 0.3), inset 0 0 60px rgba(212, 175, 55, 0.1);
+        }
 
+        /* SELO DE CERA PADRÃO */
         .wax-seal {
             position: absolute; top: 35px; right: 35px; width: 140px; height: 140px;
             background: radial-gradient(circle at 35% 35%, #e63946, #b00000, #5c0000);
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            color: #ffe8e0; font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 800;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; text-align: center;
+            color: #ffe8e0; font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 800; line-height: 1.1;
             transform: rotate(-15deg) scale(0); z-index: 50; letter-spacing: 1px;
             box-shadow: inset 0 0 15px rgba(50,0,0,0.9), inset 0 0 0 5px rgba(255,100,100,0.3), 0 15px 30px rgba(0,0,0,0.8);
             border: 2px solid #540000; text-shadow: 1px 2px 3px rgba(0,0,0,0.9);
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s, background 0.4s, box-shadow 0.4s;
         }
         .modal-overlay.active .wax-seal { transform: rotate(-15deg) scale(1); }
-        .wax-seal::before {
-            content: ''; position: absolute; width: 112%; height: 112%;
-            border-radius: 40% 60% 55% 45% / 55% 45% 60% 40%;
-            background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(130,0,0,0.8) 100%);
-            border: 2px solid rgba(80,0,0,0.5); filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5));
+        .wax-seal::before { content: ''; position: absolute; width: 112%; height: 112%; border-radius: 40% 60% 55% 45% / 55% 45% 60% 40%; background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(130,0,0,0.8) 100%); border: 2px solid rgba(80,0,0,0.5); filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5)); transition: background 0.4s, border-color 0.4s; }
+
+        /* SELO DE OURO VIP */
+        .modal-masterpiece .wax-seal {
+            background: radial-gradient(circle at 35% 35%, #ffdf00, #d4af37, #8b6508);
+            color: #fff; border-color: #d4af37;
+            box-shadow: inset 0 0 20px rgba(139, 101, 8, 0.9), inset 0 0 0 5px rgba(255, 223, 0, 0.5), 0 20px 40px rgba(212, 175, 55, 0.7);
+        }
+        .modal-masterpiece .wax-seal::before {
+            background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(139, 101, 8, 0.8) 100%);
+            border-color: rgba(212, 175, 55, 0.9); filter: drop-shadow(0 5px 10px rgba(212, 175, 55, 0.5));
         }
 
-        .modal-image-container {
-            width: 45%; display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent);
-            border-right: 1px solid #222; position: relative; perspective: 1500px;
-        }
-        
-        .modal-dvd-case {
-            width: 280px; height: 400px; position: relative; transform-style: preserve-3d;
-            animation: modalFloat 7s ease-in-out infinite; filter: drop-shadow(-30px 40px 30px rgba(0,0,0,0.9));
-        }
-
-        @keyframes modalFloat {
-            0% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); }
-            50% { transform: translateY(-20px) rotateY(10deg) rotateX(-5deg); }
-            100% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); }
-        }
-
+        .modal-image-container { width: 45%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent); border-right: 1px solid #222; position: relative; perspective: 1500px; }
+        .modal-dvd-case { width: 280px; height: 400px; position: relative; transform-style: preserve-3d; animation: modalFloat 7s ease-in-out infinite; filter: drop-shadow(-30px 40px 30px rgba(0,0,0,0.9)); }
+        @keyframes modalFloat { 0% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); } 50% { transform: translateY(-20px) rotateY(10deg) rotateX(-5deg); } 100% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); } }
         .dvd-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 4px 10px 10px 4px; }
-        .dvd-front {
-            transform: translateZ(calc(var(--modal-dvd-depth) / 2)); background: #000; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.3); box-shadow: inset 3px 0 10px rgba(255,255,255,0.2);
-        }
+        .dvd-front { transform: translateZ(calc(var(--modal-dvd-depth) / 2)); background: #000; overflow: hidden; border: 1px solid rgba(255,255,255,0.3); box-shadow: inset 3px 0 10px rgba(255,255,255,0.2); }
         .dvd-front img { width: 100%; height: 100%; object-fit: cover; }
-        .dvd-front::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(125deg, transparent 30%, rgba(255,255,255,0.2) 45%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.1) 55%, transparent 70%);
-            mix-blend-mode: screen; pointer-events: none;
-        }
-        .dvd-side {
-            width: var(--modal-dvd-depth); height: 100%;
-            transform: rotateY(-90deg) translateZ(calc(var(--modal-dvd-depth) / 2));
-            background-color: #111; border: 1px solid rgba(255,255,255,0.15); box-shadow: inset -15px 0 30px rgba(0,0,0,1);
-        }
-
+        .dvd-front::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(125deg, transparent 30%, rgba(255,255,255,0.2) 45%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.1) 55%, transparent 70%); mix-blend-mode: screen; pointer-events: none; }
+        .dvd-side { width: var(--modal-dvd-depth); height: 100%; transform: rotateY(-90deg) translateZ(calc(var(--modal-dvd-depth) / 2)); background-color: #111; border: 1px solid rgba(255,255,255,0.15); box-shadow: inset -15px 0 30px rgba(0,0,0,1); }
         .modal-info { width: 55%; padding: 60px; display: flex; flex-direction: column; justify-content: center; position: relative; }
         .anim-text { opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
         .modal-overlay.active .anim-text { opacity: 1; transform: translateY(0); }
@@ -229,57 +287,33 @@
         .modal-overlay.active .delay-2 { transition-delay: 0.4s; }
         .modal-overlay.active .delay-3 { transition-delay: 0.6s; }
         .modal-overlay.active .delay-4 { transition-delay: 0.8s; }
-
-        .modal-title-display {
-            font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 700; color: #fff;
-            margin-bottom: 25px; text-shadow: 0 5px 10px rgba(0,0,0,0.8);
-            border-bottom: 2px solid #333; padding-bottom: 15px; line-height: 1.2;
-        }
+        .modal-title-display { font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 700; color: #fff; margin-bottom: 25px; text-shadow: 0 5px 10px rgba(0,0,0,0.8); border-bottom: 2px solid #333; padding-bottom: 15px; line-height: 1.2; }
         .modal-score-title { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: #888; text-transform: uppercase; letter-spacing: 2px; }
         .modal-score-wrapper { position: relative; display: inline-block; margin-bottom: 20px; }
-        .modal-score-wrapper::before {
-            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 150px; height: 150px; background: radial-gradient(circle, var(--gold-glow), transparent 70%);
-            z-index: -1; animation: pulseGlow 4s infinite;
-        }
+        .modal-score-wrapper::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 150px; height: 150px; background: radial-gradient(circle, var(--gold-glow), transparent 70%); z-index: -1; animation: pulseGlow 4s infinite; }
         @keyframes pulseGlow { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
         .modal-score-value { font-family: 'Cinzel', serif; font-size: clamp(4rem, 8vw, 6rem); color: var(--gold); line-height: 1; text-shadow: 0 10px 30px rgba(0,0,0,0.9); display: inline-block; }
         .modal-platform { display: inline-block; background: #222; border: 1px solid var(--gold); color: var(--gold); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;}
         .modal-date { font-size: 1.1rem; color: #ccc; margin-bottom: 20px; font-weight: bold; }
         .modal-desc { font-size: 1.1rem; line-height: 1.6; color: #bbb; border-left: 3px solid var(--gold); padding-left: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 0 8px 8px 0;}
-
-        .close-btn {
-            position: absolute; top: 15px; left: 15px;
-            background: rgba(0,0,0,0.5); border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%;
-            font-size: 1.2rem; color: #aaa; cursor: pointer; z-index: 20; transition: 0.3s;
-            display: flex; justify-content: center; align-items: center;
-        }
+        .close-btn { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.5); border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; color: #aaa; cursor: pointer; z-index: 20; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
         .close-btn:hover { background: var(--gold); color: #000; transform: scale(1.1); box-shadow: 0 0 20px var(--gold-glow); border-color: var(--gold); }
 
         /* PAINEL ADMIN */
-        #admin-panel {
-            display: none; position: fixed; bottom: 0; left: 0; width: 100%;
-            background: #0a0a0a; border-top: 2px solid var(--gold); padding: 25px; z-index: 2000;
-            box-shadow: 0 -15px 50px rgba(0,0,0,0.9); max-height: 50vh; overflow-y: auto;
-        }
+        #admin-panel { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; border-top: 2px solid var(--gold); padding: 25px; z-index: 2000; box-shadow: 0 -15px 50px rgba(0,0,0,0.9); max-height: 50vh; overflow-y: auto; }
         .admin-controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;}
-        .admin-btn {
-            background: var(--gold); color: #000; border: none; padding: 10px 20px;
-            font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Montserrat', sans-serif;
-            transition: 0.2s; text-transform: uppercase; font-size: 0.8rem;
-        }
+        .admin-btn { background: var(--gold); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Montserrat', sans-serif; transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; }
         .admin-btn.danger { background: #e63946; color: #fff; }
         .admin-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .led-picker { display: flex; align-items: center; gap: 10px; background: #1a1a1a; border: 1px solid #444; padding: 5px 15px; border-radius: 4px; }
+        .led-picker label { color: #aaa; font-family: 'Montserrat'; font-size: 0.8rem; font-weight: bold; }
+        .led-picker input { cursor: pointer; border: none; background: transparent; width: 30px; height: 30px; padding: 0; }
         #add-form { display: none; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
         #add-form input, #add-form select { padding: 10px; background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: 'Montserrat'; }
-        .delete-btn { 
-            position: absolute; top: -15px; right: -15px; background: #e63946; color: white; border: 2px solid #fff; 
-            border-radius: 50%; width: 35px; height: 35px; font-weight: bold; font-size: 1.2rem; cursor: pointer; 
-            display: none; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.8); transition: 0.2s;
-        }
+        .delete-btn { position: absolute; top: -15px; right: -15px; background: #e63946; color: white; border: 2px solid #fff; border-radius: 50%; width: 35px; height: 35px; font-weight: bold; font-size: 1.2rem; cursor: pointer; display: none; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.8); transition: 0.2s; }
         .delete-btn:hover { transform: scale(1.2); }
 
-        /* === RESPONSIVIDADE (MOBILE E TABLETS) === */
+        /* RESPONSIVIDADE */
         @media (max-width: 900px) {
             .modal-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
             .modal-image-container { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; }
@@ -289,11 +323,12 @@
             .shelf-row { height: auto; padding-top: 20px; }
         }
         @media (max-width: 600px) {
-            .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; }
+            .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; margin-bottom: 15px; }
             .case-side { width: 30px; transform: rotateY(-90deg) translateZ(15px); }
             .case-front { transform: translateZ(15px); }
             .case-top { height: 30px; transform: rotateX(90deg) translateZ(15px); }
             :root { --case-depth: 30px; }
+            .platform-badge { font-size: 0.6rem; bottom: -22px; }
         }
     </style>
 </head>
@@ -301,8 +336,12 @@
 
 <header>
     <h1 id="main-title">Jogos Finalizados</h1>
+    <p class="subtitle">A partir de 2025</p>
+    
     <div class="controls-bar">
-        <label for="sort-select">Organizar estante:</label>
+        <button id="btn-led" class="btn-led" onclick="toggleLED()">💡 LEDs: ON</button>
+        
+        <label for="sort-select" style="margin-left: 10px;">Organizar estante:</label>
         <select id="sort-select" onchange="handleSort()">
             <option value="recent">Mais Recentes Adicionados</option>
             <option value="score">Maior Nota</option>
@@ -316,7 +355,8 @@
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
         <button class="close-btn" onclick="closeModal()">✖</button>
-        <div class="wax-seal">FINALIZADO</div>
+        
+        <div class="wax-seal" id="m-seal">FINALIZADO</div>
         
         <div class="modal-image-container">
             <div class="modal-dvd-case">
@@ -344,6 +384,12 @@
 <div id="admin-panel">
     <div class="admin-controls">
         <span style="color: var(--gold); font-weight: bold; font-family: 'Cinzel'; font-size: 1rem; margin-right: 10px;">MODO DEUS ATIVO</span>
+        
+        <div class="led-picker">
+            <label>Cor do LED:</label>
+            <input type="color" id="i-led-color" value="#00e5ff" onchange="updateLEDColor(this.value)">
+        </div>
+
         <button class="admin-btn" onclick="toggleAddForm()">+ Novo Jogo</button>
         <button class="admin-btn" onclick="toggleDeleteMode()" id="del-mode-btn">Deletar Capas</button>
         <button class="admin-btn danger" onclick="exportData()">💾 Exportar para o GitHub</button>
@@ -366,20 +412,61 @@
 </div>
 
 <script>
+    const defaultLedColor = '#00e5ff';
     const defaultGames = [
-    {
-        "title": "Minecruft",
-        "cover": "https://store-images.s-microsoft.com/image/apps.808.14492077886571533.be42f4bd-887b-4430-8ed0-622341b4d2b0.c8274c53-105e-478b-9f4b-41b8088210a3?q=90&w=512&h=768&mode=crop&format=jpg&background=%23FFFFFF",
-        "platform": "PC",
-        "score": "10",
-        "date": "2026",
-        "review": ""
-    }
-];
+        {
+            "title": "Elden Ring",
+            "cover": "https://image.api.playstation.com/vulcan/ap/rnd/202110/2000/phvVT0qZfcRms5qDAk0SI3CM.png",
+            "platform": "Xbox Series X",
+            "score": "10",
+            "date": "2026",
+            "review": "A liberdade de exploração é insana. Uma verdadeira obra-prima dos RPGs de ação."
+        },
+        {
+            "title": "Minecruft",
+            "cover": "https://store-images.s-microsoft.com/image/apps.808.14492077886571533.be42f4bd-887b-4430-8ed0-622341b4d2b0.c8274c53-105e-478b-9f4b-41b8088210a3?q=90&w=512&h=768&mode=crop&format=jpg&background=%23FFFFFF",
+            "platform": "PC",
+            "score": "8.5",
+            "date": "2026",
+            "review": "Um clássico eterno para se jogar relaxando."
+        }
+    ];
 
     let games = JSON.parse(localStorage.getItem('nerisCollection')) || defaultGames;
+    let ledState = JSON.parse(localStorage.getItem('nerisLedState')) || { isOn: true, color: defaultLedColor };
     let displayGames = [...games]; 
     let isAdmin = false; let deleteMode = false;
+
+    function applyLEDState() {
+        document.documentElement.style.setProperty('--led-color', ledState.color);
+        const btn = document.getElementById('btn-led');
+        const rows = document.querySelectorAll('.shelf-row');
+        
+        if (ledState.isOn) {
+            btn.classList.add('active');
+            btn.innerHTML = '💡 LEDs: ON';
+            rows.forEach(row => row.classList.add('led-active'));
+        } else {
+            btn.classList.remove('active');
+            btn.innerHTML = '💡 LEDs: OFF';
+            rows.forEach(row => row.classList.remove('led-active'));
+        }
+        
+        const picker = document.getElementById('i-led-color');
+        if(picker) picker.value = ledState.color;
+    }
+
+    function toggleLED() {
+        ledState.isOn = !ledState.isOn;
+        localStorage.setItem('nerisLedState', JSON.stringify(ledState));
+        applyLEDState();
+    }
+
+    function updateLEDColor(color) {
+        ledState.color = color;
+        localStorage.setItem('nerisLedState', JSON.stringify(ledState));
+        applyLEDState();
+    }
 
     function handleSort() {
         const sortType = document.getElementById('sort-select').value;
@@ -395,7 +482,7 @@
         let shelfRow, shelfContent;
         
         const isMobile = window.innerWidth <= 600;
-        const itemsPerShelf = isMobile ? 3 : 6; // Ajusta limite na estante se for celular
+        const itemsPerShelf = isMobile ? 3 : 6;
 
         displayGames.forEach((game, index) => {
             if (index % itemsPerShelf === 0) {
@@ -405,9 +492,12 @@
             }
 
             const wrapper = document.createElement('div'); wrapper.className = 'game-case-wrapper';
-            const shadow = document.createElement('div'); shadow.className = 'case-shadow'; wrapper.appendChild(shadow);
+            
+            if (parseFloat(game.score) === 10) {
+                wrapper.classList.add('masterpiece');
+            }
 
-            // Selo da Plataforma
+            const shadow = document.createElement('div'); shadow.className = 'case-shadow'; wrapper.appendChild(shadow);
             const platformBadge = document.createElement('div'); platformBadge.className = 'platform-badge';
             platformBadge.innerText = game.platform || "PC";
             wrapper.appendChild(platformBadge);
@@ -419,18 +509,31 @@
 
             wrapper.onclick = () => { if(!deleteMode) openModal(game); };
 
+            // CRIANDO A CÁPSULA ANIMADA DE FLUTUAR
+            const animator = document.createElement('div'); animator.className = 'game-case-animator';
+            
             const gameCase = document.createElement('div'); gameCase.className = 'game-case';
             const front = document.createElement('div'); front.className = 'case-face case-front';
             const img = document.createElement('img'); img.src = game.cover; front.appendChild(img);
-
             const side = document.createElement('div'); side.className = 'case-face case-side';
             side.style.backgroundImage = `url(${game.cover})`; side.style.backgroundSize = 'cover'; side.style.backgroundPosition = 'left center'; 
-
             const top = document.createElement('div'); top.className = 'case-face case-top';
 
-            gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top);
-            wrapper.appendChild(delBtn); wrapper.appendChild(gameCase); shelfContent.appendChild(wrapper);
+            // NOVO REFLEXO 3D SEGURO (Que gira com a caixa perfeitamente)
+            const reflection = document.createElement('div'); reflection.className = 'game-reflection';
+            const refImg = document.createElement('img'); refImg.src = game.cover; reflection.appendChild(refImg);
+
+            gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top); 
+            gameCase.appendChild(reflection); 
+            
+            // Coloca o gameCase (que gira no hover) dentro do animator (que flutua sempre)
+            animator.appendChild(gameCase);
+            wrapper.appendChild(animator); 
+            
+            wrapper.appendChild(delBtn); shelfContent.appendChild(wrapper);
         });
+        
+        applyLEDState();
     }
 
     const modal = document.getElementById('modal');
@@ -438,11 +541,22 @@
         document.getElementById('m-img').src = game.cover;
         const modalSide = document.getElementById('m-side');
         modalSide.style.backgroundImage = `url(${game.cover})`; modalSide.style.backgroundSize = 'cover'; modalSide.style.backgroundPosition = 'left center';
+        
         document.getElementById('m-title-display').innerText = game.title;
         document.getElementById('m-platform').innerText = game.platform || "PC";
         document.getElementById('m-score').innerText = game.score;
         document.getElementById('m-date').innerText = game.date;
         document.getElementById('m-desc').innerText = game.review;
+
+        const seal = document.getElementById('m-seal');
+        if (parseFloat(game.score) === 10) {
+            modal.classList.add('modal-masterpiece');
+            seal.innerText = "FINALIZADO"; 
+        } else {
+            modal.classList.remove('modal-masterpiece');
+            seal.innerText = "FINALIZADO";
+        }
+
         modal.classList.add('active');
     }
     
@@ -465,7 +579,6 @@
     function toggleAddForm() {
         const form = document.getElementById('add-form'); form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
     }
-
     function toggleDeleteMode() {
         deleteMode = !deleteMode;
         const btn = document.getElementById('del-mode-btn');
@@ -501,14 +614,13 @@
     }
 
     function exportData() {
-        const dataStr = "const defaultGames = " + JSON.stringify(games, null, 4) + ";";
-        navigator.clipboard.writeText(dataStr).then(() => alert("✅ SUCESSO! Dados copiados.\n\nAbra o GitHub, vá no seu arquivo index.html, clique no Lápis (Editar) e substitua a parte do 'const defaultGames = [...]' pelo que você acabou de copiar. Depois clique em Commit changes.")).catch(() => alert("Erro ao copiar. Aperte F12."));
+        const dataStr = "const defaultLedColor = '" + ledState.color + "';\nconst defaultGames = " + JSON.stringify(games, null, 4) + ";";
+        navigator.clipboard.writeText(dataStr).then(() => alert("✅ SUCESSO! Dados copiados.\n\nAbra o GitHub, vá no seu arquivo index.html, clique em Editar e substitua as linhas do 'defaultLedColor' e 'defaultGames' pelo que você acabou de copiar. Depois clique em Commit changes.")).catch(() => alert("Erro ao copiar. Aperte F12."));
     }
 
-    window.addEventListener('resize', renderLibrary); // Re-renderiza se mudar o tamanho da tela
+    window.addEventListener('resize', renderLibrary); 
     handleSort();
 </script>
 
 </body>
 </html>
-
