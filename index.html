@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --wood-dark: #0a0705;
@@ -61,16 +63,19 @@
         }
         .controls-bar select:hover { background: #222; box-shadow: 0 0 15px var(--gold-glow); }
 
-        .btn-led {
+        .btn-led, .btn-mural {
             background: #111; color: #fff; border: 1px solid #555;
             padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-weight: bold;
-            border-radius: 4px; cursor: pointer; outline: none; transition: 0.3s;
+            border-radius: 4px; cursor: pointer; outline: none; transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
-        .btn-led:hover { background: #222; }
+        .btn-led:hover, .btn-mural:hover { background: #222; border-color: var(--gold); }
         .btn-led.active {
             border-color: var(--led-color); color: var(--led-color); box-shadow: 0 0 15px var(--led-color);
             text-shadow: 0 0 5px var(--led-color);
         }
+
+        /* Loading */
+        #loading-msg { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.5rem; margin-top: 50px; text-shadow: 0 0 10px var(--gold); }
 
         /* A ESTANTE VOLUMÉTRICA */
         .library-container {
@@ -80,7 +85,7 @@
             border-right: clamp(10px, 3vw, 35px) solid #140a05; 
             border-top: clamp(10px, 3vw, 35px) solid #140a05;
             box-shadow: 0 50px 100px rgba(0,0,0,1), inset 0 0 60px rgba(0,0,0,0.9);
-            background: var(--wood-dark); border-radius: 8px;
+            background: var(--wood-dark); border-radius: 8px; display: none; /* Escondido até carregar o BD */
         }
 
         .shelf-row {
@@ -100,9 +105,7 @@
             border-top: 2px solid rgba(255,255,255,0.03); transition: box-shadow 0.4s;
         }
 
-        .shelf-row.led-active {
-            box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8), inset 0 25px 60px -20px var(--led-color);
-        }
+        .shelf-row.led-active { box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8), inset 0 25px 60px -20px var(--led-color); }
         .shelf-row.led-active::after {
             content: ''; position: absolute; top: -2px; left: 0; width: 100%; height: 6px;
             background: var(--led-color); box-shadow: 0 5px 30px 10px var(--led-color);
@@ -112,44 +115,27 @@
 
         .shelf-content {
             display: flex; gap: 45px; position: relative; z-index: 10;
-            transform-style: preserve-3d; padding: 0 40px; 
-            flex-wrap: nowrap; 
-            justify-content: center;
+            transform-style: preserve-3d; padding: 0 40px; flex-wrap: nowrap; justify-content: center;
         }
 
         /* CAIXA DA PRATELEIRA */
-        .game-case-wrapper {
-            width: 190px; height: 270px;
-            perspective: 1200px; cursor: pointer; position: relative; margin-top: 30px;
-        }
-        
+        .game-case-wrapper { width: 190px; height: 270px; perspective: 1200px; cursor: pointer; position: relative; margin-top: 30px; }
         .game-case-animator { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
-
         .case-shadow {
             position: absolute; bottom: -15px; left: -20px; width: 140%; height: 40px;
             background: radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, transparent 70%);
-            transform: rotateX(70deg) translateZ(-20px);
-            z-index: -1; transition: 0.4s ease; opacity: 0.8;
+            transform: rotateX(70deg) translateZ(-20px); z-index: -1; transition: 0.4s ease; opacity: 0.8;
         }
         .game-case-wrapper:hover .case-shadow { transform: rotateX(70deg) translateZ(-20px) scale(1.1) translateX(10px); opacity: 1; }
 
         .game-case {
             width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
-            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
-            transform-origin: center center; z-index: 2;
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1); transform-origin: center center; z-index: 2;
         }
         .game-case-wrapper:hover .game-case { transform: rotateY(35deg) translateZ(30px) translateY(-10px); }
 
-        .case-face {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            backface-visibility: hidden; border-radius: 3px 8px 8px 3px;
-        }
-        
-        .case-front {
-            transform: translateZ(calc(var(--case-depth) / 2)); background: #000; overflow: hidden;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15), inset 2px 0 5px rgba(255,255,255,0.1);
-            transition: box-shadow 0.4s;
-        }
+        .case-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 3px 8px 8px 3px; }
+        .case-front { transform: translateZ(calc(var(--case-depth) / 2)); background: #000; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15), inset 2px 0 5px rgba(255,255,255,0.1); transition: box-shadow 0.4s; }
         .case-front img { width: 100%; height: 100%; object-fit: cover; }
         .case-front::after {
             content: ''; position: absolute; top: 0; left: -150%; width: 100%; height: 100%;
@@ -158,22 +144,11 @@
         }
         .game-case-wrapper:hover .case-front::after { left: 150%; }
 
-        .case-side {
-            width: var(--case-depth); height: 100%;
-            transform: rotateY(-90deg) translateZ(calc(var(--case-depth) / 2));
-            background-color: #111; 
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), inset -5px 0 15px rgba(0,0,0,0.8);
-            transition: box-shadow 0.4s;
-        }
-        .case-top {
-            width: 100%; height: var(--case-depth); background: #1a1a1a;
-            transform: rotateX(90deg) translateZ(calc(var(--case-depth) / 2));
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
-        }
+        .case-side { width: var(--case-depth); height: 100%; transform: rotateY(-90deg) translateZ(calc(var(--case-depth) / 2)); background-color: #111; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), inset -5px 0 15px rgba(0,0,0,0.8); transition: box-shadow 0.4s; }
+        .case-top { width: 100%; height: var(--case-depth); background: #1a1a1a; transform: rotateX(90deg) translateZ(calc(var(--case-depth) / 2)); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
 
         .game-reflection {
-            position: absolute; top: 100%; left: 0; width: 100%; height: 100%;
-            transform-origin: top;
+            position: absolute; top: 100%; left: 0; width: 100%; height: 100%; transform-origin: top;
             transform: rotateX(180deg) translateZ(calc(var(--case-depth) / 2));
             -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 40%);
             mask-image: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 40%);
@@ -190,9 +165,7 @@
         }
         .game-case-wrapper:hover .platform-badge { color: var(--gold); border-color: var(--gold); background: rgba(10, 5, 2, 1); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
 
-        /* =========================================================
-           EFEITO OBRA-PRIMA
-           ========================================================= */
+        /* OBRA-PRIMA */
         .masterpiece .game-case-animator { animation: floatMasterpiece 4s ease-in-out infinite; }
         @keyframes floatMasterpiece { 0%, 100% { transform: translateY(-5px); } 50% { transform: translateY(-18px); } }
         .masterpiece:hover .game-case { transform: scale(1.05) rotateY(35deg) translateZ(40px); }
@@ -205,7 +178,7 @@
         .masterpiece .platform-badge { background: linear-gradient(135deg, #1a1400, #403000); border: 1px solid var(--gold); color: var(--gold); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.6); }
         .masterpiece .platform-badge::before { content: '👑 '; }
 
-        /* === MODAL & DVD GIGANTE === */
+        /* === MODAL E DVD GIGANTE === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content { background: linear-gradient(145deg, #1f1f1f, #0a0a0a); width: 1100px; max-width: 95%; height: 600px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 50px rgba(0,0,0,0.8); display: flex; position: relative; transform: scale(0.9) translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
@@ -240,6 +213,7 @@
         .modal-overlay.active .delay-2 { transition-delay: 0.2s; }
         .modal-overlay.active .delay-3 { transition-delay: 0.3s; }
         .modal-overlay.active .delay-4 { transition-delay: 0.4s; }
+        .modal-overlay.active .delay-5 { transition-delay: 0.5s; }
 
         .modal-title-display { font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 700; color: #fff; margin-bottom: 25px; text-shadow: 0 5px 10px rgba(0,0,0,0.8); border-bottom: 2px solid #333; padding-bottom: 15px; line-height: 1.2; margin-top: 10px;}
         .modal-score-title { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: #888; text-transform: uppercase; letter-spacing: 2px; }
@@ -249,6 +223,41 @@
         .modal-platform { display: inline-block; background: #222; border: 1px solid var(--gold); color: var(--gold); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;}
         .modal-date { font-size: 1.1rem; color: #ccc; margin-bottom: 20px; font-weight: bold; }
         .modal-desc { font-size: 1.1rem; line-height: 1.6; color: #bbb; border-left: 3px solid var(--gold); padding-left: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 30px;}
+
+        /* === PRINTS (LIGHTBOX) === */
+        .print-thumbnail-container { display: none; margin-top: 10px; }
+        .print-thumbnail-container p { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: bold;}
+        .print-thumbnail { width: 180px; height: 100px; object-fit: cover; border: 2px solid #444; border-radius: 6px; cursor: pointer; transition: 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .print-thumbnail:hover { border-color: var(--gold); transform: scale(1.05); box-shadow: 0 8px 20px rgba(212,175,55,0.4); }
+
+        .lightbox-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999;
+            display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(10px);
+        }
+        .lightbox-overlay.active { opacity: 1; pointer-events: all; }
+        .lightbox-content { position: relative; max-width: 90%; max-height: 90%; }
+        .lightbox-content img { max-width: 100%; max-height: 90vh; border: 2px solid var(--gold); border-radius: 8px; box-shadow: 0 0 40px rgba(212,175,55,0.3); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .lightbox-overlay.active img { transform: scale(1); }
+        .lightbox-close { position: absolute; top: -20px; right: -20px; background: #e63946; color: #fff; border: 2px solid #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .lightbox-close:hover { transform: scale(1.2) rotate(90deg); }
+
+        /* === MURAL DE ASSINATURAS === */
+        .mural-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000; }
+        .mural-overlay.active { opacity: 1; pointer-events: all; }
+        .mural-content { background: #111; width: 1000px; max-width: 95%; height: 600px; border-radius: 12px; border: 2px solid var(--gold); display: flex; position: relative; transform: translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
+        .mural-overlay.active .mural-content { transform: translateY(0); opacity: 1; }
+        
+        .mural-gallery { width: 50%; padding: 30px; border-right: 1px solid #333; overflow-y: auto; background: #0a0a0a;}
+        .mural-gallery h2 { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 20px; text-align: center; }
+        .signatures-grid { display: flex; flex-direction: column; gap: 15px; }
+        .sig-item { background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333; display: flex; justify-content: center;}
+        .sig-item img { max-width: 100%; filter: drop-shadow(0 0 5px rgba(212,175,55,0.5)); }
+
+        .mural-draw-area { width: 50%; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+        .mural-draw-area h2 { font-family: 'Cinzel'; color: #fff; margin-bottom: 10px; }
+        .mural-draw-area p { font-family: 'Montserrat'; font-size: 0.9rem; color: #888; margin-bottom: 20px; text-align: center;}
+        #signature-pad { background: #222; border: 2px dashed #555; border-radius: 8px; cursor: crosshair; box-shadow: inset 0 0 20px rgba(0,0,0,1);}
+        .mural-actions { margin-top: 20px; display: flex; gap: 10px; }
 
         .close-btn { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.5); border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; color: #aaa; cursor: pointer; z-index: 20; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
         .close-btn:hover { background: var(--gold); color: #000; transform: scale(1.1); box-shadow: 0 0 20px var(--gold-glow); border-color: var(--gold); }
@@ -269,10 +278,10 @@
 
         /* RESPONSIVIDADE */
         @media (max-width: 900px) {
-            .modal-content { flex-direction: column; height: auto; max-height: 90vh; }
-            .modal-image-container { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; min-height: 350px;}
+            .modal-content, .mural-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
+            .modal-image-container, .mural-draw-area { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; }
             .modal-dvd-case { width: 200px; height: 280px; }
-            .modal-info { width: 100%; padding: 30px 20px; overflow-y: visible;}
+            .modal-info, .mural-gallery { width: 100%; padding: 30px 20px; overflow-y: visible;}
             .wax-seal { top: 15px; right: 15px; width: 100px; height: 100px; font-size: 0.9rem; }
             .shelf-row { height: auto; padding-top: 20px; }
         }
@@ -283,10 +292,13 @@
             .case-top { height: 30px; transform: rotateX(90deg) translateZ(15px); }
             :root { --case-depth: 30px; }
             .platform-badge { font-size: 0.6rem; bottom: -22px; }
+            .lightbox-close { top: -10px; right: 0; }
         }
     </style>
 </head>
 <body>
+
+<div class="bg-particles"></div>
 
 <header>
     <h1 id="main-title">Jogos Finalizados</h1>
@@ -294,6 +306,7 @@
     
     <div class="controls-bar">
         <button id="btn-led" class="btn-led" onclick="toggleLED()">💡 LEDs: ON</button>
+        <button class="btn-mural" onclick="openMural()">✍️ Mural de Assinaturas</button>
         
         <label for="sort-select" style="margin-left: 10px;">Organizar estante:</label>
         <select id="sort-select" onchange="handleSort()">
@@ -304,12 +317,12 @@
     </div>
 </header>
 
+<div id="loading-msg">Carregando Banco de Dados...</div>
 <div class="library-container" id="library"></div>
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
         <button class="close-btn" onclick="closeModal()">✖</button>
-        
         <div class="wax-seal" id="m-seal">FINALIZADO</div>
         
         <div class="modal-image-container">
@@ -331,6 +344,41 @@
             </div>
             <p class="modal-date anim-text delay-3">Data do Zeramento: <span style="color: var(--gold);" id="m-date"></span></p>
             <p class="modal-desc anim-text delay-4">"<span id="m-desc"></span>"</p>
+
+            <div class="print-thumbnail-container anim-text delay-5" id="m-print-container">
+                <p>📸 Print Guardado</p>
+                <img id="m-print-thumb" class="print-thumbnail" src="" alt="Miniatura do Print" onclick="openLightbox()">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+    <div class="lightbox-content">
+        <button class="lightbox-close" onclick="closeLightbox(event)">✖</button>
+        <img id="lightbox-img" src="" alt="Print Expandido">
+    </div>
+</div>
+
+<div class="mural-overlay" id="mural-modal">
+    <div class="mural-content">
+        <button class="close-btn" onclick="closeMural()">✖</button>
+        
+        <div class="mural-draw-area">
+            <h2>Deixe sua Marca</h2>
+            <p>Faça uma assinatura rápida com o mouse abaixo e salve no banco de dados.</p>
+            <canvas id="signature-pad" width="350" height="200"></canvas>
+            <div class="mural-actions">
+                <button class="admin-btn danger" onclick="clearCanvas()">Limpar</button>
+                <button class="admin-btn" id="btn-save-sig" onclick="saveSignature()">Salvar no Mural</button>
+            </div>
+        </div>
+
+        <div class="mural-gallery">
+            <h2>Assinaturas Anteriores</h2>
+            <div class="signatures-grid" id="sig-grid">
+                <p style="color: #666; text-align: center;">Carregando mural...</p>
+            </div>
         </div>
     </div>
 </div>
@@ -345,13 +393,12 @@
         </div>
 
         <button class="admin-btn" onclick="toggleAddForm()">+ Novo Jogo</button>
-        <button class="admin-btn" onclick="toggleDeleteMode()" id="del-mode-btn">Deletar Capas</button>
-        <button class="admin-btn danger" onclick="exportData()">💾 Exportar para o GitHub</button>
+        <button class="admin-btn danger" onclick="toggleDeleteMode()" id="del-mode-btn">Habilitar Exclusão</button>
         <button class="admin-btn" onclick="logoutAdmin()" style="background: #333; color: #fff;">Sair</button>
     </div>
     <div id="add-form">
         <input type="text" id="i-title" placeholder="Nome do Jogo" required>
-        <input type="text" id="i-cover" placeholder="Link da Imagem (Capa)" required>
+        <input type="text" id="i-cover" placeholder="Link da Capa" required>
         <select id="i-platform">
             <option value="PC">PC</option>
             <option value="Xbox Series X">Xbox Series X</option>
@@ -361,283 +408,66 @@
         </select>
         <input type="number" id="i-score" placeholder="Nota (ex: 9.5)" step="0.1" required>
         <input type="text" id="i-date" placeholder="Data (DD/MM/AAAA)" required>
+        <input type="text" id="i-print" placeholder="Link do Print (Opcional)">
         <input type="text" id="i-desc" placeholder="Review/Comentário Curto" style="width: 300px;" required>
-        <button class="admin-btn" onclick="saveNewGame()">Salvar Jogo</button>
+        <button class="admin-btn" id="btn-save-game" onclick="saveNewGame()">Salvar Jogo na Nuvem</button>
     </div>
 </div>
 
 <script>
-    const defaultLedColor = '#000000';
-const defaultGames = [
-    {
-        "title": "Arizona Sunshine",
-        "cover": "https://image.api.playstation.com/vulcan/img/rnd/202005/1908/fe7HKihi3ySCRYfwkjjO2M9s.png",
-        "platform": "PC",
-        "score": "8.5",
-        "date": "2026",
-        "review": ""
-    },
-    {
-        "title": "Castlevania symphony of the night",
-        "cover": "https://i.scdn.co/image/ab67616d0000b273aafa93f5ac3b3b9a22727862",
-        "platform": "PC",
-        "score": "10",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Alundra",
-        "cover": "https://preview.redd.it/thoughts-about-alundra-v0-5kq4xu1y4dwd1.jpeg?auto=webp&s=b9ef1428ae6033a89bd122e08f44c5513cf691d5",
-        "platform": "PC",
-        "score": "7.8",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Altered Beast",
-        "cover": "https://images.gog.com/ff0a22047df90308f453709fbd1523c78ebbc0bb34323d3b6a39cc088d580908_glx_vertical_cover.webp?namespace=gamesdb",
-        "platform": "PC",
-        "score": "5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "The light brigade",
-        "cover": "https://howlongtobeat.com/games/124565_The_Light_Brigade.jpg",
-        "platform": "Meta Quest 3",
-        "score": "9.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Maestro",
-        "cover": "https://image.api.playstation.com/vulcan/ap/rnd/202505/1216/8aa85489f68f65ede885adee1a33eb94c61c371d7d6876d5.png",
-        "platform": "Meta Quest 3",
-        "score": "7.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Red Matter",
-        "cover": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/966680/capsule_616x353.jpg?t=1727912175",
-        "platform": "Meta Quest 3",
-        "score": "8.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "chants of sennaar",
-        "cover": "https://store-images.s-microsoft.com/image/apps.39234.14019132985152487.acce0d33-e53b-464e-94c1-c4bba3e2edbd.a0a6dbc1-ef5f-4ad9-8eed-8d9f39377811",
-        "platform": "Xbox Series X",
-        "score": "8",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "tales of arise",
-        "cover": "https://gaming-cdn.com/images/products/5870/orig/tales-of-arise-pc-jogo-steam-cover.jpg?v=1710427647",
-        "platform": "Xbox Series X",
-        "score": "7",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "A plague tale requiem",
-        "cover": "https://cdn1.epicgames.com/salesEvent/salesEvent/PlagueTale1_1200x1600-98f9fd41d86634c1f82e4b5cbfc4e83f",
-        "platform": "Xbox Series X",
-        "score": "7.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "A plague tale innocence",
-        "cover": "https://image.api.playstation.com/vulcan/ap/rnd/202106/2216/l786jmG4WHmfCcfiVyiL9xSQ.jpg",
-        "platform": "Xbox Series X",
-        "score": "7.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Princess Peach Showtime ",
-        "cover": "https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_4/2x1_NSwitch_PrincessPeachShowtime_image1600w.jpg",
-        "platform": "Nintendo Switch",
-        "score": "7.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Cassette Beasts",
-        "cover": "https://wiki.cassettebeasts.com/images/thumb/2/22/CassetteBeasts_keyart_tall.png/300px-CassetteBeasts_keyart_tall.png",
-        "platform": "Xbox Series X",
-        "score": "6.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Cocoon",
-        "cover": "https://image.api.playstation.com/vulcan/ap/rnd/202308/0320/cc3c2db338f165b2bcc0911de7265c76a77676467ccc4186.png",
-        "platform": "Xbox Series X",
-        "score": "8",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Control",
-        "cover": "https://cdn1.epicgames.com/offer/calluna/Control_Portrait_Storefront_1200X1600_1200x1600-456c920cae7a0aa9b36670cd5e1237a1",
-        "platform": "Xbox Series X",
-        "score": "8",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Creatures of Ava",
-        "cover": "https://cdn1.epicgames.com/spt-assets/a2a82a68f6f445c4a5179375fac55179/creatures-of-ava-1load.jpg",
-        "platform": "Xbox Series X",
-        "score": "6.5",
-        "date": "",
-        "review": ""
-    },
-    {
-        "title": "Doom",
-        "cover": "https://image.api.playstation.com/vulcan/ap/rnd/202009/2814/GGyEnCkIXoyiVlN9sRHkzUPo.png",
-        "platform": "Xbox Series X",
-        "score": "8.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Doom Eternal",
-        "cover": "https://image.api.playstation.com/vulcan/ap/rnd/202010/0114/ERNPc4gFqeRDG1tYQIfOKQtM.png",
-        "platform": "PC",
-        "score": "8.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Dungeon Of Hinterberg",
-        "cover": "https://cdn1.epicgames.com/spt-assets/c464fda9d8d74aecae8b0cebcc905b77/dungeons-of-hinterberg-ohxt1.jpg",
-        "platform": "PC",
-        "score": "8",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Hitman Codename 47",
-        "cover": "https://upload.wikimedia.org/wikipedia/pt/6/68/Hitman_Codename_47_capa.png",
-        "platform": "PC",
-        "score": "6",
-        "date": "2026",
-        "review": ""
-    },
-    {
-        "title": "ANNO: Mutationem",
-        "cover": "https://image.api.playstation.com/vulcan/ap/rnd/202112/2803/bHb9XyzZTghVpitXJznJINjN.jpg",
-        "platform": "PC",
-        "score": "7.5",
-        "date": "2026",
-        "review": "mais 0,5 só por causa do final fofo"
-    },
-    {
-        "title": "Evil West",
-        "cover": "https://store-images.s-microsoft.com/image/apps.3216.14176554647910182.b03fa26e-38ab-4eae-a31e-457e38d3b885.98515c15-2cca-42ec-ad44-9b778e4722f4",
-        "platform": "Xbox Series X",
-        "score": "7",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Genesis Noir",
-        "cover": "https://cdn1.epicgames.com/af18f75e1dc34500b374952304c6eb99/offer/EGS_GenesisNoir_FeralCatDen_S2-1200x1600-b56a44f29a973476ab00fb755ed2bae0.jpg",
-        "platform": "Xbox Series X",
-        "score": "7",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Avowed",
-        "cover": "https://criticalhits.com.br/wp-content/uploads/2024/08/avowed-01.jpg",
-        "platform": "Xbox Series X",
-        "score": "8",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Clair Obscur Expedition 33 ",
-        "cover": "https://img.odcdn.com.br/wp-content/uploads/2025/12/Clair-Obscur-1920x1080.jpg",
-        "platform": "Xbox Series X",
-        "score": "9",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Metaphor Refantazio",
-        "cover": "https://m.media-amazon.com/images/I/71qOGi6-FlL._AC_UF1000,1000_QL80_.jpg",
-        "platform": "Xbox Series X",
-        "score": "8",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Dead Island 2",
-        "cover": "https://cdn1.epicgames.com/offer/236c74b4cd2e4e3099cbe2ebdc9686fd/EGS_DeadIsland2_DeepSilverDambusterStudios_S2_1200x1600-efc5201842cf642eb45f73227cd0789b",
-        "platform": "Xbox Series X",
-        "score": "7.5",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "Sifu",
-        "cover": "https://cdn1.epicgames.com/offer/b7b42e2078524ab386a8b2a9856ef557/EGS_SIFUStandardEdition_Sloclap_S4_1200x1600-32aca69d756abfcc25f8581942a6162b_1200x1600-32aca69d756abfcc25f8581942a6162b",
-        "platform": "Xbox Series X",
-        "score": "8",
-        "date": "2025",
-        "review": ""
-    },
-    {
-        "title": "WilldFrost",
-        "cover": "https://store-images.s-microsoft.com/image/apps.39650.13931596525681733.af07647a-b35c-4933-8895-2d513f2402b5.9f9f7db5-3817-43f8-9764-3db8abbe7970",
-        "platform": "Xbox Series X",
-        "score": "7.5",
-        "date": "2025",
-        "review": ""
-    }
-];
+    // ==========================================
+    // ⚠️ COLOQUE SUAS CHAVES DO SUPABASE AQUI ⚠️
+    // ==========================================
+    const SUPABASE_URL = 'SUA_URL_AQUI_ENTRE_AS_ASPAS';
+    const SUPABASE_ANON_KEY = 'SUA_CHAVE_AQUI_ENTRE_AS_ASPAS';
 
-    let games = JSON.parse(localStorage.getItem('nerisCollection')) || defaultGames;
-    let ledState = JSON.parse(localStorage.getItem('nerisLedState')) || { isOn: true, color: defaultLedColor };
-    let displayGames = [...games]; 
+    // Cria o cliente Supabase
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let games = [];
+    let displayGames = []; 
     let isAdmin = false; let deleteMode = false;
+    let ledState = JSON.parse(localStorage.getItem('nerisLedState')) || { isOn: true, color: '#00e5ff' };
 
+    // CARREGA OS JOGOS DO BANCO
+    async function loadGames() {
+        if(SUPABASE_URL.includes('SUA_URL')) {
+            document.getElementById('loading-msg').innerText = "Configure a URL e a Key do Supabase no código para começar!";
+            return;
+        }
+
+        let { data, error } = await supabase.from('games').select('*').order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error(error);
+            document.getElementById('loading-msg').innerText = "Erro ao conectar ao Banco de Dados.";
+        } else {
+            games = data;
+            displayGames = [...games];
+            document.getElementById('loading-msg').style.display = 'none';
+            document.getElementById('library').style.display = 'flex';
+            renderLibrary();
+        }
+    }
+
+    // APLICAÇÃO DO LED
     function applyLEDState() {
         document.documentElement.style.setProperty('--led-color', ledState.color);
         const btn = document.getElementById('btn-led');
         const rows = document.querySelectorAll('.shelf-row');
         
         if (ledState.isOn) {
-            btn.classList.add('active');
-            btn.innerHTML = '💡 LEDs: ON';
+            btn.classList.add('active'); btn.innerHTML = '💡 LEDs: ON';
             rows.forEach(row => row.classList.add('led-active'));
         } else {
-            btn.classList.remove('active');
-            btn.innerHTML = '💡 LEDs: OFF';
+            btn.classList.remove('active'); btn.innerHTML = '💡 LEDs: OFF';
             rows.forEach(row => row.classList.remove('led-active'));
         }
-        
         const picker = document.getElementById('i-led-color');
         if(picker) picker.value = ledState.color;
     }
-
-    function toggleLED() {
-        ledState.isOn = !ledState.isOn;
-        localStorage.setItem('nerisLedState', JSON.stringify(ledState));
-        applyLEDState();
-    }
-
-    function updateLEDColor(color) {
-        ledState.color = color;
-        localStorage.setItem('nerisLedState', JSON.stringify(ledState));
-        applyLEDState();
-    }
+    function toggleLED() { ledState.isOn = !ledState.isOn; localStorage.setItem('nerisLedState', JSON.stringify(ledState)); applyLEDState(); }
+    function updateLEDColor(color) { ledState.color = color; localStorage.setItem('nerisLedState', JSON.stringify(ledState)); applyLEDState(); }
 
     function handleSort() {
         const sortType = document.getElementById('sort-select').value;
@@ -671,9 +501,7 @@ const defaultGames = [
 
             const wrapper = document.createElement('div'); wrapper.className = 'game-case-wrapper';
             
-            if (parseFloat(game.score) === 10) {
-                wrapper.classList.add('masterpiece');
-            }
+            if (parseFloat(game.score) === 10) wrapper.classList.add('masterpiece');
 
             const shadow = document.createElement('div'); shadow.className = 'case-shadow'; wrapper.appendChild(shadow);
             const platformBadge = document.createElement('div'); platformBadge.className = 'platform-badge';
@@ -681,14 +509,12 @@ const defaultGames = [
             wrapper.appendChild(platformBadge);
 
             const delBtn = document.createElement('button'); delBtn.className = 'delete-btn'; delBtn.innerText = 'X';
-            const realIndex = games.findIndex(g => g.title === game.title); 
-            delBtn.onclick = (e) => { e.stopPropagation(); deleteGame(realIndex); };
+            delBtn.onclick = (e) => { e.stopPropagation(); deleteGame(game.id); }; // Agora deleta pelo ID do banco
             if(isAdmin && deleteMode) delBtn.style.display = 'block';
 
             wrapper.onclick = () => { if(!deleteMode) openModal(game); };
 
             const animator = document.createElement('div'); animator.className = 'game-case-animator';
-            
             const gameCase = document.createElement('div'); gameCase.className = 'game-case';
             const front = document.createElement('div'); front.className = 'case-face case-front';
             const img = document.createElement('img'); img.src = game.cover; front.appendChild(img);
@@ -699,12 +525,17 @@ const defaultGames = [
             const reflection = document.createElement('div'); reflection.className = 'game-reflection';
             const refImg = document.createElement('img'); refImg.src = game.cover; reflection.appendChild(refImg);
 
+            if (parseFloat(game.score) === 10) {
+                for(let i=0; i<3; i++) {
+                    const spark = document.createElement('div'); spark.className = 'sparkle';
+                    spark.style.left = `${Math.random() * 80 + 10}%`; spark.style.animationDelay = `${Math.random() * 2}s`;
+                    animator.appendChild(spark);
+                }
+            }
+
             gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top); 
             gameCase.appendChild(reflection); 
-            
-            animator.appendChild(gameCase);
-            wrapper.appendChild(animator); 
-            wrapper.appendChild(delBtn); shelfContent.appendChild(wrapper);
+            animator.appendChild(gameCase); wrapper.appendChild(animator); wrapper.appendChild(delBtn); shelfContent.appendChild(wrapper);
         });
         
         applyLEDState();
@@ -720,14 +551,19 @@ const defaultGames = [
         document.getElementById('m-platform').innerText = game.platform || "PC";
         document.getElementById('m-score').innerText = game.score;
         document.getElementById('m-date').innerText = game.date;
-        document.getElementById('m-desc').innerText = game.review;
+        document.getElementById('m-desc').innerText = game.review || 'Sem comentários.';
+
+        // LÓGICA DO PRINT
+        const printContainer = document.getElementById('m-print-container');
+        const printThumb = document.getElementById('m-print-thumb');
+        if (game.print && game.print.trim() !== "") {
+            printThumb.src = game.print; printContainer.style.display = 'block';
+        } else {
+            printContainer.style.display = 'none'; printThumb.src = "";
+        }
 
         const seal = document.getElementById('m-seal');
-        if (parseFloat(game.score) === 10) {
-            modal.classList.add('modal-masterpiece');
-        } else {
-            modal.classList.remove('modal-masterpiece');
-        }
+        if (parseFloat(game.score) === 10) { modal.classList.add('modal-masterpiece'); } else { modal.classList.remove('modal-masterpiece'); }
         
         document.getElementById('m-info-scroll').scrollTop = 0;
         modal.classList.add('active');
@@ -736,68 +572,145 @@ const defaultGames = [
     function closeModal() { modal.classList.remove('active'); }
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
+    // LIGHTBOX
+    function openLightbox() {
+        const thumbSrc = document.getElementById('m-print-thumb').src;
+        if(thumbSrc) { document.getElementById('lightbox-img').src = thumbSrc; document.getElementById('lightbox').classList.add('active'); }
+    }
+    function closeLightbox(event) {
+        if(event.target.id === 'lightbox' || event.target.className === 'lightbox-close') { document.getElementById('lightbox').classList.remove('active'); }
+    }
+
+    // ADMIN (SUPABASE)
     let clicks = 0;
     document.getElementById('main-title').addEventListener('click', () => {
         clicks++;
         if(clicks === 3) {
-            clicks = 0;
-            const password = prompt("Modo Deus. Senha:");
-            if(password === "nerisadmin") {
-                isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; renderLibrary(); 
-            }
+            clicks = 0; const password = prompt("Modo Deus. Senha:");
+            if(password === "nerisadmin") { isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; renderLibrary(); }
         }
         setTimeout(() => clicks = 0, 2000);
     });
 
     function toggleAddForm() {
-        const form = document.getElementById('add-form'); form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
+        const form = document.getElementById('add-form'); 
+        form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
+        if(form.style.display === 'flex') {
+            document.getElementById('btn-save-game').innerText = "Salvar Novo Jogo";
+            document.getElementById('i-title').value = ''; document.getElementById('i-cover').value = ''; document.getElementById('i-score').value = ''; document.getElementById('i-date').value = ''; document.getElementById('i-desc').value = ''; document.getElementById('i-print').value = '';
+        }
     }
     function toggleDeleteMode() {
         deleteMode = !deleteMode;
         const btn = document.getElementById('del-mode-btn');
-        btn.innerText = deleteMode ? "Cancelar Exclusão" : "Deletar Capas";
+        btn.innerText = deleteMode ? "Cancelar Exclusão" : "Habilitar Exclusão";
         btn.style.background = deleteMode ? "#e63946" : "var(--gold)"; btn.style.color = deleteMode ? "#fff" : "#000";
         renderLibrary();
     }
 
-    function saveNewGame() {
+    async function saveNewGame() {
         const title = document.getElementById('i-title').value; const cover = document.getElementById('i-cover').value;
-        const platform = document.getElementById('i-platform').value;
-        const score = document.getElementById('i-score').value; const date = document.getElementById('i-date').value;
-        const review = document.getElementById('i-desc').value;
+        const platform = document.getElementById('i-platform').value; const score = document.getElementById('i-score').value;
+        const date = document.getElementById('i-date').value; const review = document.getElementById('i-desc').value;
+        const print = document.getElementById('i-print').value;
 
         if(!title || !cover) return alert("Preencha título e capa!");
-        games.unshift({ title, cover, platform, score, date, review });
-        localStorage.setItem('nerisCollection', JSON.stringify(games));
-        
-        document.getElementById('i-title').value = ''; document.getElementById('i-cover').value = '';
-        document.getElementById('i-score').value = ''; document.getElementById('i-date').value = ''; 
-        document.getElementById('i-desc').value = '';
-        toggleAddForm(); handleSort(); 
+
+        const btn = document.getElementById('btn-save-game');
+        btn.innerText = "Salvando na Nuvem..."; btn.disabled = true;
+
+        const { data, error } = await supabase.from('games').insert([{ title, cover, platform, score, date, review, print }]);
+
+        if(error) {
+            alert("Erro ao salvar no banco!"); console.error(error);
+        } else {
+            document.getElementById('add-form').style.display = 'none';
+            await loadGames(); // Recarrega da nuvem
+        }
+        btn.innerText = "Salvar Jogo"; btn.disabled = false;
     }
 
-    function deleteGame(index) {
-        if(confirm("Expulsar esse jogo da estante?")) {
-            games.splice(index, 1); localStorage.setItem('nerisCollection', JSON.stringify(games)); handleSort();
+    async function deleteGame(id) {
+        if(confirm("Excluir pra sempre do banco de dados?")) {
+            await supabase.from('games').delete().eq('id', id);
+            await loadGames();
         }
     }
 
-    function logoutAdmin() {
-        isAdmin = false; deleteMode = false;
-        document.getElementById('admin-panel').style.display = 'none'; renderLibrary();
+    function logoutAdmin() { isAdmin = false; deleteMode = false; document.getElementById('admin-panel').style.display = 'none'; renderLibrary(); }
+
+    // === MURAL DE ASSINATURAS (CANVAS) ===
+    const canvas = document.getElementById('signature-pad');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    // Configura pincel dourado neon
+    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.shadowBlur = 5; ctx.shadowColor = '#d4af37';
+
+    canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+    canvas.addEventListener('mousemove', (e) => { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); }});
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseout', () => isDrawing = false);
+
+    // Suporte para Touch (Celular)
+    canvas.addEventListener('touchstart', (e) => { 
+        isDrawing = true; const touch = e.touches[0]; const rect = canvas.getBoundingClientRect();
+        ctx.beginPath(); ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    });
+    canvas.addEventListener('touchmove', (e) => { 
+        if (isDrawing) { e.preventDefault(); const touch = e.touches[0]; const rect = canvas.getBoundingClientRect();
+        ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top); ctx.stroke(); }
+    });
+    canvas.addEventListener('touchend', () => isDrawing = false);
+
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    function openMural() {
+        document.getElementById('mural-modal').classList.add('active');
+        loadSignatures();
+    }
+    function closeMural() { document.getElementById('mural-modal').classList.remove('active'); clearCanvas(); }
+
+    async function loadSignatures() {
+        const grid = document.getElementById('sig-grid');
+        grid.innerHTML = '<p style="color: #666; text-align: center;">Carregando...</p>';
+        
+        let { data, error } = await supabase.from('signatures').select('*').order('created_at', { ascending: false }).limit(20);
+        
+        grid.innerHTML = '';
+        if(data && data.length > 0) {
+            data.forEach(sig => {
+                const div = document.createElement('div'); div.className = 'sig-item';
+                const img = document.createElement('img'); img.src = sig.image_data;
+                div.appendChild(img); grid.appendChild(div);
+            });
+        } else {
+            grid.innerHTML = '<p style="color: #666; text-align: center;">Nenhuma assinatura ainda. Seja o primeiro!</p>';
+        }
     }
 
-    function exportData() {
-        const dataStr = "const defaultLedColor = '" + ledState.color + "';\nconst defaultGames = " + JSON.stringify(games, null, 4) + ";";
-        navigator.clipboard.writeText(dataStr).then(() => alert("✅ SUCESSO! Dados copiados.\n\nAbra o GitHub, vá no seu arquivo index.html, clique em Editar e substitua as linhas do 'defaultLedColor' e 'defaultGames' pelo que você acabou de copiar. Depois clique em Commit changes.")).catch(() => alert("Erro ao copiar. Aperte F12."));
+    async function saveSignature() {
+        const btn = document.getElementById('btn-save-sig');
+        
+        // Verifica se o canvas está vazio verificando pixels
+        const blank = document.createElement('canvas'); blank.width = canvas.width; blank.height = canvas.height;
+        if(canvas.toDataURL() === blank.toDataURL()) return alert("Desenhe algo antes de salvar!");
+
+        btn.innerText = "Salvando..."; btn.disabled = true;
+        const imageData = canvas.toDataURL('image/png');
+
+        const { error } = await supabase.from('signatures').insert([{ image_data: imageData }]);
+        if(!error) { clearCanvas(); loadSignatures(); } else { alert("Erro ao salvar assinatura."); }
+        
+        btn.innerText = "Salvar no Mural"; btn.disabled = false;
     }
 
     window.addEventListener('resize', renderLibrary); 
-    handleSort();
+    
+    // Inicia carregando do banco de dados
+    loadGames();
 </script>
 
 </body>
 </html>
-
-
-
