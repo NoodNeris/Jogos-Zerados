@@ -11,7 +11,6 @@
 
     <style>
         :root {
-            /* Fundo da estante mais transparente para ver o vídeo através da madeira */
             --wood-dark: rgba(10, 7, 5, 0.4); 
             --wood-back: rgba(20, 13, 9, 0.6);
             --wood-floor: rgba(51, 32, 20, 0.8);
@@ -19,7 +18,6 @@
             --gold-glow: rgba(212, 175, 55, 0.4);
             --case-depth: 45px;
             --modal-dvd-depth: 60px;
-            --led-color: #00e5ff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,7 +40,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -3; /* Fica atrás de absolutamente tudo */
+            z-index: -3; 
         }
         .video-container video {
             width: 100%;
@@ -50,7 +48,6 @@
             object-fit: cover;
         }
 
-        /* Degradê para escurecer o rodapé da tela, facilitando a leitura dos jogos */
         .video-overlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -66,7 +63,7 @@
         .bg-particles::after {
             content: ''; position: absolute; top: 0; left: 0; width: 200vw; height: 200vh;
             background-image: radial-gradient(var(--gold) 1px, transparent 1px);
-            background-size: 80px 80px; opacity: 0.1;
+            background-size: 80px 80px; opacity: 0.08;
             animation: floatBG 90s linear infinite;
         }
         @keyframes floatBG {
@@ -77,16 +74,15 @@
         /* === CABEÇALHO IMERSIVO ESTILO STEAM === */
         .hero-section {
             width: 100%;
-            height: 65vh; /* Ocupa 65% da tela inicial */
+            height: 65vh; 
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Empurra o texto para baixo */
-            align-items: flex-start; /* Alinha o texto na esquerda */
-            padding: 50px 8vw; /* Espaçamento das bordas */
+            justify-content: flex-end; 
+            align-items: flex-start; 
+            padding: 50px 8vw; 
             z-index: 10;
         }
 
-        /* O TÍTULO (Livre, sem caixa, com contorno preto) */
         .hero-title {
             font-family: 'Cinzel', serif; 
             font-size: clamp(3rem, 7vw, 6.5rem); 
@@ -96,10 +92,9 @@
             letter-spacing: 4px;
             margin-bottom: 0;
             line-height: 1.1;
-            /* CONTORNO PRETO ESTILO LOGO DE JOGO */
             -webkit-text-stroke: 2px #000; 
             text-shadow: 0px 15px 30px rgba(0,0,0,0.9);
-            transition: transform 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .hero-title:hover {
             transform: scale(1.02) translateX(10px);
@@ -113,7 +108,6 @@
             letter-spacing: 4px; 
             font-weight: bold;
             margin-top: 5px;
-            /* Contorno fino no subtítulo */
             -webkit-text-stroke: 1px #000;
             text-shadow: 0 5px 15px rgba(0,0,0,0.9);
         }
@@ -124,7 +118,7 @@
             max-width: 1500px;
             margin: 0 auto 40px auto;
             background: rgba(10, 10, 10, 0.7);
-            backdrop-filter: blur(10px); /* Vidro fosco elegante */
+            backdrop-filter: blur(10px); 
             padding: 15px 30px; 
             display: flex; justify-content: center; gap: 20px; align-items: center;
             border-radius: 12px; 
@@ -148,10 +142,6 @@
             border-radius: 4px; cursor: pointer; outline: none; transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
         .btn-action:hover { background: rgba(30,30,30,0.9); border-color: var(--gold); }
-        .btn-action.active {
-            border-color: var(--led-color); color: var(--led-color); box-shadow: 0 0 15px var(--led-color);
-            text-shadow: 0 0 5px var(--led-color);
-        }
 
         #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-bottom: 30px; text-shadow: 0 0 10px #000; padding: 0 20px; position: relative; z-index: 10;}
 
@@ -164,7 +154,7 @@
             border-top: clamp(10px, 3vw, 35px) solid rgba(15,10,5,0.8);
             box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8);
             background: var(--wood-dark); 
-            backdrop-filter: blur(8px); /* Deixa o vídeo visível, mas desfocado, atrás da estante */
+            backdrop-filter: blur(8px); 
             border-radius: 8px; display: none;
             z-index: 10;
             position: relative;
@@ -187,21 +177,24 @@
             border-top: 2px solid rgba(255,255,255,0.03); transition: box-shadow 0.4s;
         }
 
-        .shelf-row.led-active { box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8), inset 0 25px 60px -20px var(--led-color); }
-        .shelf-row.led-active::after {
-            content: ''; position: absolute; top: -2px; left: 0; width: 100%; height: 6px;
-            background: var(--led-color); box-shadow: 0 5px 30px 10px var(--led-color);
-            opacity: 0.65; z-index: 5; pointer-events: none;
-        }
-        .shelf-row.led-active::before { box-shadow: inset 0 30px 60px rgba(0,0,0,0.9), inset 0 60px 80px -40px var(--led-color); }
-
         .shelf-content {
             display: flex; gap: 45px; position: relative; z-index: 10;
             transform-style: preserve-3d; padding: 0 40px; flex-wrap: nowrap; justify-content: center;
         }
 
-        .game-case-wrapper { width: 190px; height: 270px; perspective: 1200px; cursor: pointer; position: relative; margin-top: 30px; }
+        /* ANIMAÇÃO DE CASCATA SUAVE NOS JOGOS */
+        @keyframes gameAppear {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .game-case-wrapper { 
+            width: 190px; height: 270px; perspective: 1200px; cursor: pointer; position: relative; margin-top: 30px; 
+            animation: gameAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards; /* Aplica a animação no carregamento */
+        }
+        
         .game-case-animator { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
+        
         .case-shadow {
             position: absolute; bottom: -15px; left: -20px; width: 140%; height: 40px;
             background: radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, transparent 70%);
@@ -265,6 +258,7 @@
         }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-150px) scale(0); opacity: 0; } }
 
+        /* MODAL E DVD GIGANTE */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content { background: linear-gradient(145deg, #1f1f1f, #0a0a0a); width: 1100px; max-width: 95%; height: 600px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 50px rgba(0,0,0,0.8); display: flex; position: relative; transform: scale(0.9) translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
@@ -317,13 +311,23 @@
         .print-thumbnail { width: 160px; height: 90px; object-fit: cover; border: 2px solid #444; border-radius: 6px; cursor: pointer; transition: 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-shrink: 0; }
         .print-thumbnail:hover { border-color: var(--gold); transform: scale(1.05); box-shadow: 0 8px 20px rgba(212,175,55,0.4); }
 
+        /* === PRINTS LIGHTBOX (Agora Clean, sem borda amarela) === */
         .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(10px); }
         .lightbox-overlay.active { opacity: 1; pointer-events: all; }
         .lightbox-content { position: relative; max-width: 90%; max-height: 90%; }
-        .lightbox-content img { max-width: 100%; max-height: 90vh; border: 2px solid var(--gold); border-radius: 8px; box-shadow: 0 0 40px rgba(212,175,55,0.3); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        .lightbox-content img { 
+            max-width: 100%; max-height: 90vh; 
+            border-radius: 10px; 
+            /* Sombra suave e escura no lugar da borda dourada */
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9); 
+            transform: scale(0.95); 
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
         .lightbox-overlay.active img { transform: scale(1); }
-        .lightbox-close { position: absolute; top: -20px; right: -20px; background: #e63946; color: #fff; border: 2px solid #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
-        .lightbox-close:hover { transform: scale(1.2) rotate(90deg); }
+        
+        .lightbox-close { position: absolute; top: -20px; right: -20px; background: rgba(0,0,0,0.7); color: #fff; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.8); backdrop-filter: blur(5px);}
+        .lightbox-close:hover { background: var(--gold); color: #000; transform: scale(1.1); border-color: var(--gold); }
 
         /* Mural de Assinaturas */
         .mural-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.4s ease; z-index: 1000; }
@@ -356,9 +360,6 @@
         .admin-btn { background: var(--gold); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Montserrat', sans-serif; transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; }
         .admin-btn.danger { background: #e63946; color: #fff; }
         .admin-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
-        .led-picker { display: flex; align-items: center; gap: 10px; background: #1a1a1a; border: 1px solid #444; padding: 5px 15px; border-radius: 4px; }
-        .led-picker label { color: #aaa; font-family: 'Montserrat'; font-size: 0.8rem; font-weight: bold; }
-        .led-picker input { cursor: pointer; border: none; background: transparent; width: 30px; height: 30px; padding: 0; }
         #add-form { display: none; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
         #add-form input, #add-form select { padding: 10px; background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: 'Montserrat'; }
         
@@ -382,7 +383,7 @@
             .mural-header-info { text-align: center; }
             .mural-actions { flex-direction: row; }
             .hero-section { align-items: center; height: 50vh; }
-            h1 { font-size: clamp(2.5rem, 8vw, 4rem); text-align: center; }
+            .hero-title { font-size: clamp(2.5rem, 8vw, 4rem); text-align: center; }
             .controls-bar { width: 95%; margin-top: 0; }
         }
         @media (max-width: 600px) {
@@ -408,12 +409,11 @@
 <div class="bg-particles"></div>
 
 <header class="hero-section">
-    <h1 id="main-title">Jogos Finalizados</h1>
-    <p class="subtitle">A partir de 2025</p>
+    <h1 id="main-title" class="hero-title">Jogos Finalizados</h1>
+    <p class="subtitle hero-subtitle">A partir de 2025</p>
 </header>
     
 <div class="controls-bar">
-    <button id="btn-led" class="btn-action" onclick="toggleLED()">💡 LEDs: ON</button>
     <button class="btn-action" onclick="openMural()">✍️ Mural de Assinaturas</button>
     
     <label for="sort-select" style="margin-left: 10px;">Organizar estante:</label>
@@ -477,13 +477,13 @@
         
         <div class="mural-header">
             <div class="mural-header-info">
-                <h2>Mural da Comunidade</h2>
+                <h2>Mural de Assinaturas</h2>
                 <p>Deixe sua marca no site. Desenhe sua assinatura.</p>
             </div>
             <canvas id="signature-pad" width="300" height="150"></canvas>
             <div class="mural-actions">
-                <button class="admin-btn" id="btn-save-sig" onclick="saveSignature()">Salvar Marca</button>
-                <button class="admin-btn danger" onclick="clearCanvas()">Limpar</button>
+                <button class="btn-action" style="justify-content: center;" id="btn-save-sig" onclick="saveSignature()">Salvar Marca</button>
+                <button class="btn-action" style="justify-content: center; border-color: #e63946;" onclick="clearCanvas()">Limpar</button>
             </div>
         </div>
 
@@ -497,11 +497,6 @@
     <div class="admin-controls">
         <span style="color: var(--gold); font-weight: bold; font-family: 'Cinzel'; font-size: 1rem; margin-right: 10px;">MODO DEUS ATIVO</span>
         
-        <div class="led-picker">
-            <label>Cor do LED:</label>
-            <input type="color" id="i-led-color" value="#00e5ff" onchange="updateLEDColor(this.value)">
-        </div>
-
         <button class="admin-btn" onclick="toggleAddForm()">+ Novo Jogo</button>
         <button class="admin-btn danger" onclick="toggleDeleteMode()" id="del-mode-btn">Habilitar Edição</button>
         <button class="admin-btn" onclick="logoutAdmin()" style="background: #333; color: #fff;">Sair</button>
@@ -512,9 +507,12 @@
         <select id="i-platform">
             <option value="PC">PC</option>
             <option value="Xbox Series X">Xbox Series X</option>
+            <option value="PlayStation 5">PlayStation 5</option>
+            <option value="Nintendo Switch">Nintendo Switch</option>
             <option value="Meta Quest 3">Meta Quest 3</option>
             <option value="Jogo de Tabuleiro">Jogo de Tabuleiro</option>
-            <option value="Nintendo Switch">Nintendo Switch</option>
+            <option value="Emulador (PCSX2)">Emulador (PCSX2)</option>
+            <option value="Emulador (Outros)">Emulador (Outros)</option>
         </select>
         <input type="number" id="i-score" placeholder="Nota (ex: 9.5)" step="0.1" required>
         <input type="text" id="i-date" placeholder="Data (DD/MM/AAAA)" required>
@@ -535,12 +533,6 @@
     let isAdmin = false; 
     let deleteMode = false;
     let editTargetId = null; 
-    
-    let ledState = { isOn: true, color: '#00e5ff' };
-    try {
-        const savedLed = localStorage.getItem('nerisLedState');
-        if (savedLed) ledState = JSON.parse(savedLed);
-    } catch(e) {}
 
     async function initApp() {
         try {
@@ -552,36 +544,9 @@
             document.getElementById('library').style.display = 'flex';
             renderLibrary();
         } catch (err) {
-            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor.";
+            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor. Verifique o Supabase.";
             document.getElementById('library').style.display = 'flex';
         }
-    }
-
-    function applyLEDState() {
-        document.documentElement.style.setProperty('--led-color', ledState.color);
-        const btn = document.getElementById('btn-led');
-        const rows = document.querySelectorAll('.shelf-row');
-        if (ledState.isOn) {
-            btn.classList.add('active'); btn.innerHTML = '💡 LEDs: ON';
-            rows.forEach(row => row.classList.add('led-active'));
-        } else {
-            btn.classList.remove('active'); btn.innerHTML = '💡 LEDs: OFF';
-            rows.forEach(row => row.classList.remove('led-active'));
-        }
-        const picker = document.getElementById('i-led-color');
-        if(picker) picker.value = ledState.color;
-    }
-    
-    function toggleLED() { 
-        ledState.isOn = !ledState.isOn; 
-        try { localStorage.setItem('nerisLedState', JSON.stringify(ledState)); } catch(e){}
-        applyLEDState(); 
-    }
-    
-    function updateLEDColor(color) { 
-        ledState.color = color; 
-        try { localStorage.setItem('nerisLedState', JSON.stringify(ledState)); } catch(e){}
-        applyLEDState(); 
     }
 
     function handleSort() {
@@ -613,7 +578,11 @@
                 shelfRow.appendChild(shelfContent); library.appendChild(shelfRow);
             }
 
-            const wrapper = document.createElement('div'); wrapper.className = 'game-case-wrapper';
+            const wrapper = document.createElement('div'); 
+            wrapper.className = 'game-case-wrapper';
+            // Escalonamento suave na animação
+            wrapper.style.animationDelay = `${(index % capacity) * 0.1}s`;
+
             if (parseFloat(game.score) === 10) wrapper.classList.add('masterpiece');
 
             const shadow = document.createElement('div'); shadow.className = 'case-shadow'; wrapper.appendChild(shadow);
@@ -652,8 +621,6 @@
             gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top); gameCase.appendChild(reflection); 
             animator.appendChild(gameCase); wrapper.appendChild(animator); wrapper.appendChild(actionBtns); shelfContent.appendChild(wrapper);
         });
-        
-        applyLEDState();
     }
 
     const modal = document.getElementById('modal');
