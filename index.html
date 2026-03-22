@@ -93,7 +93,7 @@
         }
 
         /* Loading */
-        #loading-msg { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.5rem; margin-top: 50px; text-shadow: 0 0 10px var(--gold); }
+        #loading-msg { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-top: 50px; text-shadow: 0 0 10px var(--gold); padding: 0 20px;}
 
         /* A ESTANTE VOLUMÉTRICA */
         .library-container {
@@ -348,7 +348,7 @@
     </div>
 </header>
 
-<div id="loading-msg">Carregando Banco de Dados...</div>
+<div id="loading-msg">Conectando ao Banco de Dados...</div>
 <div class="library-container" id="library"></div>
 
 <div class="modal-overlay" id="modal">
@@ -448,39 +448,47 @@
 
 <script>
     // ==========================================
-    // CHAVES DO SUPABASE (CONFIGURADAS)
+    // CHAVES DO SUPABASE
     // ==========================================
     const SUPABASE_URL = 'https://hqtctbvrtipperfbkxfd.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_9KqLVuA2pGACwtOlbmw9ug_ATvduPkE';
 
-    // Cria o cliente Supabase
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Cria o cliente Supabase de forma segura (sem conflito de nomes)
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let games = [];
     let displayGames = []; 
     let isAdmin = false; 
     let deleteMode = false;
-    let editTargetId = null; // Agora usamos o ID do banco para editar
-    let ledState = JSON.parse(localStorage.getItem('nerisLedState')) || { isOn: true, color: '#00e5ff' };
+    let editTargetId = null; 
+    
+    // Tratamento à prova de falhas para o LocalStorage
+    let ledState = { isOn: true, color: '#00e5ff' };
+    try {
+        const savedLed = localStorage.getItem('nerisLedState');
+        if (savedLed) ledState = JSON.parse(savedLed);
+    } catch(e) {
+        console.log("Memória do LED resetada.");
+    }
 
     // CARREGA OS JOGOS DO BANCO
     async function loadGames() {
-        if(SUPABASE_URL.includes('SUA_URL')) {
-            document.getElementById('loading-msg').innerText = "Configure a URL e a Key do Supabase no código para começar!";
-            return;
-        }
-
-        let { data, error } = await supabase.from('games').select('*').order('created_at', { ascending: false });
-        
-        if (error) {
-            console.error(error);
-            document.getElementById('loading-msg').innerText = "Erro ao conectar ao Banco de Dados.";
-        } else {
-            games = data;
+        try {
+            let { data, error } = await supabaseClient.from('games').select('*').order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            
+            games = data || [];
             displayGames = [...games];
             document.getElementById('loading-msg').style.display = 'none';
             document.getElementById('library').style.display = 'flex';
             renderLibrary();
+
+        } catch (err) {
+            console.error("Erro Supabase:", err);
+            // Se der erro, mostra mensagem, mas EXIBE a biblioteca vazia para você conseguir abrir o Modo Deus
+            document.getElementById('loading-msg').innerText = "⚠️ Erro no Banco de Dados! Você rodou o código SQL no Supabase?";
+            document.getElementById('library').style.display = 'flex';
         }
     }
 
@@ -500,8 +508,18 @@
         const picker = document.getElementById('i-led-color');
         if(picker) picker.value = ledState.color;
     }
-    function toggleLED() { ledState.isOn = !ledState.isOn; localStorage.setItem('nerisLedState', JSON.stringify(ledState)); applyLEDState(); }
-    function updateLEDColor(color) { ledState.color = color; localStorage.setItem('nerisLedState', JSON.stringify(ledState)); applyLEDState(); }
+    
+    function toggleLED() { 
+        ledState.isOn = !ledState.isOn; 
+        try { localStorage.setItem('nerisLedState', JSON.stringify(ledState)); } catch(e){}
+        applyLEDState(); 
+    }
+    
+    function updateLEDColor(color) { 
+        ledState.color = color; 
+        try { localStorage.setItem('nerisLedState', JSON.stringify(ledState)); } catch(e){}
+        applyLEDState(); 
+    }
 
     function handleSort() {
         const sortType = document.getElementById('sort-select').value;
@@ -625,6 +643,7 @@
 
     // ADMIN (SUPABASE)
     let clicks = 0;
+    // Os Event Listeners ficam no topo para sempre funcionarem
     document.getElementById('main-title').addEventListener('click', () => {
         clicks++;
         if(clicks === 3) {
@@ -652,7 +671,7 @@
     }
 
     function startEditGame(game) {
-        editTargetId = game.id; // Guarda o ID do Supabase
+        editTargetId = game.id; 
         document.getElementById('i-title').value = game.title; 
         document.getElementById('i-cover').value = game.cover;
         document.getElementById('i-platform').value = game.platform;
@@ -677,26 +696,34 @@
         const btn = document.getElementById('btn-save-game');
         btn.innerText = "Processando Nuvem..."; btn.disabled = true;
 
-        if (editTargetId) {
-            // ATUALIZAR JOGO
-            const { error } = await supabase.from('games').update({ title, cover, platform, score, date, review, print }).eq('id', editTargetId);
-            if(error) { alert("Erro ao atualizar!"); console.error(error); }
-        } else {
-            // NOVO JOGO
-            const { error } = await supabase.from('games').insert([{ title, cover, platform, score, date, review, print }]);
-            if(error) { alert("Erro ao salvar!"); console.error(error); }
+        try {
+            if (editTargetId) {
+                // ATUALIZAR
+                const { error } = await supabaseClient.from('games').update({ title, cover, platform, score, date, review, print }).eq('id', editTargetId);
+                if(error) throw error;
+            } else {
+                // NOVO
+                const { error } = await supabaseClient.from('games').insert([{ title, cover, platform, score, date, review, print }]);
+                if(error) throw error;
+            }
+            document.getElementById('add-form').style.display = 'none';
+            editTargetId = null;
+            await loadGames(); 
+        } catch (err) {
+            alert("Erro ao salvar! Veja o console (F12).");
+            console.error(err);
         }
-
-        document.getElementById('add-form').style.display = 'none';
-        editTargetId = null;
-        await loadGames(); // Recarrega da nuvem
         btn.innerText = "Salvar na Nuvem"; btn.disabled = false;
     }
 
     async function deleteGame(id) {
         if(confirm("Excluir pra sempre do banco de dados?")) {
-            await supabase.from('games').delete().eq('id', id);
-            await loadGames();
+            try {
+                await supabaseClient.from('games').delete().eq('id', id);
+                await loadGames();
+            } catch(e) {
+                alert("Erro ao excluir.");
+            }
         }
     }
 
@@ -715,7 +742,7 @@
     canvas.addEventListener('mouseup', () => isDrawing = false);
     canvas.addEventListener('mouseout', () => isDrawing = false);
 
-    // Suporte para Touch (Celular)
+    // Suporte para Touch
     canvas.addEventListener('touchstart', (e) => { 
         isDrawing = true; const touch = e.touches[0]; const rect = canvas.getBoundingClientRect();
         ctx.beginPath(); ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
@@ -738,38 +765,46 @@
         const grid = document.getElementById('sig-grid');
         grid.innerHTML = '<p style="color: #666; text-align: center;">Carregando...</p>';
         
-        let { data, error } = await supabase.from('signatures').select('*').order('created_at', { ascending: false }).limit(20);
-        
-        grid.innerHTML = '';
-        if(data && data.length > 0) {
-            data.forEach(sig => {
-                const div = document.createElement('div'); div.className = 'sig-item';
-                const img = document.createElement('img'); img.src = sig.image_data;
-                div.appendChild(img); grid.appendChild(div);
-            });
-        } else {
-            grid.innerHTML = '<p style="color: #666; text-align: center;">Nenhuma assinatura ainda. Seja o primeiro!</p>';
+        try {
+            let { data, error } = await supabaseClient.from('signatures').select('*').order('created_at', { ascending: false }).limit(20);
+            if(error) throw error;
+            
+            grid.innerHTML = '';
+            if(data && data.length > 0) {
+                data.forEach(sig => {
+                    const div = document.createElement('div'); div.className = 'sig-item';
+                    const img = document.createElement('img'); img.src = sig.image_data;
+                    div.appendChild(img); grid.appendChild(div);
+                });
+            } else {
+                grid.innerHTML = '<p style="color: #666; text-align: center;">Nenhuma assinatura ainda. Seja o primeiro!</p>';
+            }
+        } catch(e) {
+            grid.innerHTML = '<p style="color: #e63946; text-align: center;">Erro ao carregar assinaturas.</p>';
         }
     }
 
     async function saveSignature() {
         const btn = document.getElementById('btn-save-sig');
-        
         const blank = document.createElement('canvas'); blank.width = canvas.width; blank.height = canvas.height;
         if(canvas.toDataURL() === blank.toDataURL()) return alert("Desenhe algo antes de salvar!");
 
         btn.innerText = "Salvando..."; btn.disabled = true;
         const imageData = canvas.toDataURL('image/png');
 
-        const { error } = await supabase.from('signatures').insert([{ image_data: imageData }]);
-        if(!error) { clearCanvas(); loadSignatures(); } else { alert("Erro ao salvar assinatura."); }
-        
+        try {
+            const { error } = await supabaseClient.from('signatures').insert([{ image_data: imageData }]);
+            if(error) throw error;
+            clearCanvas(); loadSignatures();
+        } catch(err) {
+            alert("Erro ao salvar assinatura.");
+        }
         btn.innerText = "Salvar no Mural"; btn.disabled = false;
     }
 
     window.addEventListener('resize', renderLibrary); 
     
-    // Inicia carregando do banco de dados
+    // START
     loadGames();
 </script>
 
