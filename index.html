@@ -11,9 +11,10 @@
 
     <style>
         :root {
-            --wood-dark: rgba(10, 7, 5, 0.85); /* Fundo da estante levemente transparente */
-            --wood-back: rgba(20, 13, 9, 0.9);
-            --wood-floor: #332014;
+            /* Fundo da estante mais transparente para ver o vídeo através da madeira */
+            --wood-dark: rgba(10, 7, 5, 0.4); 
+            --wood-back: rgba(20, 13, 9, 0.6);
+            --wood-floor: rgba(51, 32, 20, 0.8);
             --gold: #d4af37;
             --gold-glow: rgba(212, 175, 55, 0.4);
             --case-depth: 45px;
@@ -31,124 +32,148 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            background-color: #000; /* Fundo preto caso o vídeo demore a carregar */
+            background-color: #000;
         }
 
-        /* === VÍDEO DE FUNDO TELA CHEIA === */
-        .video-background {
+        /* === VÍDEO DE FUNDO (TELA CHEIA E FIXO) === */
+        .video-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -2;
-            overflow: hidden;
+            z-index: -3; /* Fica atrás de absolutamente tudo */
         }
-        
-        .video-background video {
+        .video-container video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Camada escura por cima do vídeo para dar contraste aos jogos e textos */
+        /* Degradê para escurecer o rodapé da tela, facilitando a leitura dos jogos */
         .video-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(5,5,5,0.85) 100%);
-            z-index: -1;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(5,5,5,0.95) 100%);
+            z-index: -2;
         }
 
-        /* === CABEÇALHO IMERSIVO === */
-        .main-header { 
+        .bg-particles {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-particles::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 200vw; height: 200vh;
+            background-image: radial-gradient(var(--gold) 1px, transparent 1px);
+            background-size: 80px 80px; opacity: 0.1;
+            animation: floatBG 90s linear infinite;
+        }
+        @keyframes floatBG {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-50vh) translateX(-50vw); }
+        }
+
+        /* === CABEÇALHO IMERSIVO ESTILO STEAM === */
+        .hero-section {
             width: 100%;
-            min-height: 50vh; /* Ocupa metade da tela inicialmente */
+            height: 65vh; /* Ocupa 65% da tela inicial */
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-            position: relative;
+            justify-content: flex-end; /* Empurra o texto para baixo */
+            align-items: flex-start; /* Alinha o texto na esquerda */
+            padding: 50px 8vw; /* Espaçamento das bordas */
             z-index: 10;
         }
 
-        h1 {
+        /* O TÍTULO (Livre, sem caixa, com contorno preto) */
+        .hero-title {
             font-family: 'Cinzel', serif; 
-            font-size: clamp(3rem, 7vw, 6rem); 
+            font-size: clamp(3rem, 7vw, 6.5rem); 
             font-weight: 800;
             color: #fff; 
             text-transform: uppercase; 
-            letter-spacing: 8px;
-            /* Brilho difuso para integrar ao vídeo */
-            text-shadow: 0px 5px 25px rgba(0,0,0,0.9), 0 0 50px rgba(212, 175, 55, 0.5);
-            margin-bottom: 10px;
-            transition: 0.3s;
+            letter-spacing: 4px;
+            margin-bottom: 0;
+            line-height: 1.1;
+            /* CONTORNO PRETO ESTILO LOGO DE JOGO */
+            -webkit-text-stroke: 2px #000; 
+            text-shadow: 0px 15px 30px rgba(0,0,0,0.9);
+            transition: transform 0.3s ease;
         }
-        h1:hover { text-shadow: 0px 5px 20px rgba(0,0,0,1), 0 0 70px rgba(212, 175, 55, 1); transform: scale(1.02); }
+        .hero-title:hover {
+            transform: scale(1.02) translateX(10px);
+        }
         
-        .subtitle {
+        .hero-subtitle {
             color: var(--gold); 
             font-family: 'Montserrat', sans-serif; 
-            font-size: clamp(1.2rem, 2vw, 1.8rem);
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
             font-style: italic; 
             letter-spacing: 4px; 
             font-weight: bold;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.9);
-            margin-bottom: 40px;
+            margin-top: 5px;
+            /* Contorno fino no subtítulo */
+            -webkit-text-stroke: 1px #000;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.9);
         }
 
-        /* === BARRA DE CONTROLES FLUTUANTE === */
+        /* === BARRA DE CONTROLES === */
         .controls-bar {
-            background: rgba(15, 10, 5, 0.6);
-            backdrop-filter: blur(12px);
+            width: 90%;
+            max-width: 1500px;
+            margin: 0 auto 40px auto;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(10px); /* Vidro fosco elegante */
             padding: 15px 30px; 
             display: flex; justify-content: center; gap: 20px; align-items: center;
             border-radius: 12px; 
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
             flex-wrap: wrap;
-            margin-bottom: 40px;
+            z-index: 10;
+            position: relative;
         }
-        .controls-bar label { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #fff; text-shadow: 0 2px 5px #000;}
+        .controls-bar label { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #fff; }
         .controls-bar select {
-            background: rgba(0,0,0,0.6); color: var(--gold); border: 1px solid var(--gold);
+            background: rgba(0,0,0,0.8); color: var(--gold); border: 1px solid var(--gold);
             padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-weight: bold;
             border-radius: 4px; cursor: pointer; outline: none; transition: 0.3s;
         }
-        .controls-bar select:hover { background: rgba(30,30,30,0.8); box-shadow: 0 0 15px var(--gold-glow); }
+        .controls-bar select:hover { background: rgba(30,30,30,0.9); box-shadow: 0 0 15px var(--gold-glow); }
 
         .btn-action {
-            background: rgba(0,0,0,0.6); color: #fff; border: 1px solid #555;
+            background: rgba(0,0,0,0.8); color: #fff; border: 1px solid #555;
             padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-weight: bold;
             border-radius: 4px; cursor: pointer; outline: none; transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
-        .btn-action:hover { background: rgba(30,30,30,0.8); border-color: var(--gold); }
+        .btn-action:hover { background: rgba(30,30,30,0.9); border-color: var(--gold); }
         .btn-action.active {
             border-color: var(--led-color); color: var(--led-color); box-shadow: 0 0 15px var(--led-color);
-            text-shadow: 0 0 5px var(--led-color); background: rgba(0,0,0,0.8);
+            text-shadow: 0 0 5px var(--led-color);
         }
 
-        #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-bottom: 40px; text-shadow: 0 0 15px #000; padding: 0 20px;}
+        #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-bottom: 30px; text-shadow: 0 0 10px #000; padding: 0 20px; position: relative; z-index: 10;}
 
         /* A ESTANTE VOLUMÉTRICA */
         .library-container {
             width: 100%; max-width: 1500px; margin: 0 auto;
             display: flex; flex-direction: column; gap: 0; padding: 0 20px 60px;
-            border-left: clamp(10px, 3vw, 35px) solid #140a05; 
-            border-right: clamp(10px, 3vw, 35px) solid #140a05; 
-            border-top: clamp(10px, 3vw, 35px) solid #140a05;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.8), inset 0 0 60px rgba(0,0,0,0.8);
+            border-left: clamp(10px, 3vw, 35px) solid rgba(15,10,5,0.8); 
+            border-right: clamp(10px, 3vw, 35px) solid rgba(15,10,5,0.8); 
+            border-top: clamp(10px, 3vw, 35px) solid rgba(15,10,5,0.8);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8);
             background: var(--wood-dark); 
-            backdrop-filter: blur(5px); /* Efeito de vidro na estante para o video transparecer levemente */
+            backdrop-filter: blur(8px); /* Deixa o vídeo visível, mas desfocado, atrás da estante */
             border-radius: 8px; display: none;
             z-index: 10;
+            position: relative;
         }
 
         .shelf-row {
             position: relative; width: 100%; min-height: 400px;
             display: flex; justify-content: center; align-items: flex-end;
-            padding-bottom: 25px; border-bottom: 45px solid rgba(28, 17, 9, 0.95);
+            padding-bottom: 25px; border-bottom: 45px solid rgba(28, 17, 9, 0.85);
             box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8);
             background: linear-gradient(to bottom, transparent, var(--wood-back));
             perspective: 1400px; z-index: 1; transition: box-shadow 0.4s;
@@ -156,7 +181,7 @@
 
         .shelf-row::before {
             content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
-            background: linear-gradient(to top, var(--wood-floor), #0a0604);
+            background: linear-gradient(to top, var(--wood-floor), transparent);
             transform-origin: bottom; transform: rotateX(65deg);
             box-shadow: inset 0 30px 60px rgba(0,0,0,0.9); z-index: 0;
             border-top: 2px solid rgba(255,255,255,0.03); transition: box-shadow 0.4s;
@@ -344,7 +369,7 @@
         .edit-btn { background: var(--gold); color: #000; }
         .edit-btn:hover { transform: scale(1.2); }
 
-        .footer-credits { text-align: center; padding: 30px; color: #444; font-size: 0.75rem; font-family: 'Montserrat', sans-serif; letter-spacing: 2px; margin-top: auto; }
+        .footer-credits { text-align: center; padding: 30px; color: #666; font-size: 0.75rem; font-family: 'Montserrat', sans-serif; letter-spacing: 2px; margin-top: auto; position: relative; z-index: 10; text-shadow: 0 2px 4px #000;}
 
         @media (max-width: 900px) {
             .modal-content, .mural-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
@@ -356,8 +381,9 @@
             .mural-header { flex-direction: column; text-align: center; }
             .mural-header-info { text-align: center; }
             .mural-actions { flex-direction: row; }
-            h1 { font-size: 2.8rem; }
-            .main-header { min-height: 35vh; padding-top: 60px; }
+            .hero-section { align-items: center; height: 50vh; }
+            h1 { font-size: clamp(2.5rem, 8vw, 4rem); text-align: center; }
+            .controls-bar { width: 95%; margin-top: 0; }
         }
         @media (max-width: 600px) {
             .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; margin-bottom: 15px; }
@@ -373,14 +399,15 @@
 </head>
 <body>
 
-<div class="video-background">
+<div class="video-container">
     <video autoplay loop muted playsinline>
-        <source src="GmRhChcaQAAZKkJ.mp4" type="video/mp4">
+        <source src="sledding-game.3840x2160.mp4" type="video/mp4">
     </video>
-    <div class="video-overlay"></div>
 </div>
+<div class="video-overlay"></div>
+<div class="bg-particles"></div>
 
-<header class="main-header">
+<header class="hero-section">
     <h1 id="main-title">Jogos Finalizados</h1>
     <p class="subtitle">A partir de 2025</p>
 </header>
@@ -525,7 +552,7 @@
             document.getElementById('library').style.display = 'flex';
             renderLibrary();
         } catch (err) {
-            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor. Configure as chaves Supabase corretamente.";
+            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor.";
             document.getElementById('library').style.display = 'flex';
         }
     }
