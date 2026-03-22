@@ -51,20 +51,61 @@
             100% { transform: translateY(-50vh) translateX(-50vw); }
         }
 
-        header { text-align: center; padding: 40px 20px 20px; position: relative; z-index: 50; }
+        /* === NOVO BANNER ESTILO STEAM === */
+        header { text-align: center; padding: 20px 20px 0; position: relative; z-index: 50; }
+        
+        .header-banner {
+            position: relative;
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto 30px auto;
+            height: 280px;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(212,175,55,0.2);
+            border: 2px solid #332014;
+            border-bottom: 4px solid var(--gold);
+        }
+
+        .banner-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            /* Escurece o vídeo para o texto brilhar mais */
+            filter: brightness(0.4) contrast(1.2); 
+        }
+
+        .banner-content {
+            position: relative;
+            z-index: 2;
+            padding: 20px 40px;
+            background: radial-gradient(circle, rgba(0,0,0,0.6) 0%, transparent 80%);
+            border-radius: 20px;
+        }
+
         h1 {
             font-family: 'Cinzel', serif; font-size: clamp(2rem, 5vw, 4rem); font-weight: 800;
             color: var(--gold); text-transform: uppercase; letter-spacing: 4px;
-            text-shadow: 0px 8px 15px rgba(0,0,0,1), 0 0 20px var(--gold-glow);
+            text-shadow: 0px 8px 15px rgba(0,0,0,1), 0 0 30px var(--gold);
             cursor: pointer; display: inline-block; margin-bottom: 5px;
             transition: 0.3s;
         }
-        h1:hover { text-shadow: 0px 10px 20px rgba(0,0,0,1), 0 0 35px var(--gold-glow); }
+        h1:hover { text-shadow: 0px 10px 20px rgba(0,0,0,1), 0 0 50px var(--gold); transform: scale(1.02); }
         
         .subtitle {
-            color: #888; font-family: 'Montserrat', sans-serif; font-size: 1rem;
-            font-style: italic; margin-bottom: 25px; letter-spacing: 1px;
+            color: #ddd; font-family: 'Montserrat', sans-serif; font-size: 1.1rem;
+            font-style: italic; letter-spacing: 1px;
+            text-shadow: 0 2px 5px #000;
         }
+        /* ================================ */
 
         .controls-bar {
             background: linear-gradient(to right, transparent, rgba(30, 20, 10, 0.8), transparent);
@@ -207,12 +248,12 @@
         .wax-seal { position: absolute; top: 35px; right: 35px; width: 140px; height: 140px; background: radial-gradient(circle at 35% 35%, #e63946, #b00000, #5c0000); border-radius: 50%; display: flex; justify-content: center; align-items: center; text-align: center; color: #ffe8e0; font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 800; line-height: 1.1; transform: rotate(-15deg) scale(0); z-index: 50; letter-spacing: 1px; box-shadow: inset 0 0 15px rgba(50,0,0,0.9), inset 0 0 0 5px rgba(255,100,100,0.3), 0 15px 30px rgba(0,0,0,0.8); border: 2px solid #540000; text-shadow: 1px 2px 3px rgba(0,0,0,0.9); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s, background 0.4s, box-shadow 0.4s; }
         .modal-overlay.active .wax-seal { transform: rotate(-15deg) scale(1); }
         .wax-seal::before { content: ''; position: absolute; width: 112%; height: 112%; border-radius: 40% 60% 55% 45% / 55% 45% 60% 40%; background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(130,0,0,0.8) 100%); border: 2px solid rgba(80,0,0,0.5); filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5)); transition: background 0.4s, border-color 0.4s; }
-
         .modal-masterpiece .wax-seal { background: radial-gradient(circle at 35% 35%, #ffdf00, #d4af37, #8b6508); color: #fff; border-color: #d4af37; box-shadow: inset 0 0 20px rgba(139, 101, 8, 0.9), inset 0 0 0 5px rgba(255, 223, 0, 0.5), 0 20px 40px rgba(212, 175, 55, 0.7); }
         .modal-masterpiece .wax-seal::before { background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(139, 101, 8, 0.8) 100%); border-color: rgba(212, 175, 55, 0.9); filter: drop-shadow(0 5px 10px rgba(212, 175, 55, 0.5)); }
 
         .modal-image-container { width: 45%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent); border-right: 1px solid #222; position: relative; perspective: 1500px; }
         .modal-dvd-case { width: 280px; height: 400px; position: relative; transform-style: preserve-3d; animation: modalFloat 7s ease-in-out infinite; filter: drop-shadow(-30px 40px 30px rgba(0,0,0,0.9)); }
+        @keyframes modalFloat { 0% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); } 50% { transform: translateY(-20px) rotateY(10deg) rotateX(-5deg); } 100% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); } }
         .dvd-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 4px 10px 10px 4px; }
         .dvd-front { transform: translateZ(calc(var(--modal-dvd-depth) / 2)); background: #000; overflow: hidden; border: 1px solid rgba(255,255,255,0.3); box-shadow: inset 3px 0 10px rgba(255,255,255,0.2); }
         .dvd-front img { width: 100%; height: 100%; object-fit: cover; }
@@ -258,7 +299,7 @@
         .lightbox-close { position: absolute; top: -20px; right: -20px; background: #e63946; color: #fff; border: 2px solid #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
         .lightbox-close:hover { transform: scale(1.2) rotate(90deg); }
 
-        /* Mural de Assinaturas (Tamanho Maior e Deleção) */
+        /* Mural de Assinaturas */
         .mural-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.4s ease; z-index: 1000; }
         .mural-overlay.active { opacity: 1; pointer-events: all; }
         .mural-content { background: radial-gradient(circle at center, #1a1a1a 0%, #080808 100%); width: 1300px; max-width: 95%; height: 85vh; border-radius: 12px; border: 2px solid #333; box-shadow: 0 0 100px rgba(0,0,0,1); display: flex; flex-direction: column; position: relative; transform: translateY(30px); opacity: 0; transition: 0.4s ease; overflow: hidden; }
@@ -305,15 +346,16 @@
         .footer-credits { text-align: center; padding: 30px; color: #444; font-size: 0.75rem; font-family: 'Montserrat', sans-serif; letter-spacing: 2px; margin-top: auto; }
 
         @media (max-width: 900px) {
-            .modal-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
-            .modal-image-container { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; }
+            .modal-content, .mural-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
+            .modal-image-container, .mural-draw-area { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; }
             .modal-dvd-case { width: 200px; height: 280px; }
-            .modal-info { width: 100%; padding: 30px 20px; overflow-y: visible;}
+            .modal-info, .mural-gallery { width: 100%; padding: 30px 20px; overflow-y: visible;}
             .wax-seal { top: 15px; right: 15px; width: 100px; height: 100px; font-size: 0.9rem; }
             .shelf-row { height: auto; padding-top: 20px; }
             .mural-header { flex-direction: column; text-align: center; }
             .mural-header-info { text-align: center; }
             .mural-actions { flex-direction: row; }
+            .header-banner { height: 200px; border-radius: 0; }
         }
         @media (max-width: 600px) {
             .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; margin-bottom: 15px; }
@@ -324,6 +366,7 @@
             .platform-badge { font-size: 0.6rem; bottom: -22px; }
             .lightbox-close { top: -10px; right: 0; }
             .sig-item img { max-width: 100%; }
+            .header-banner { height: 180px; }
         }
     </style>
 </head>
@@ -332,8 +375,15 @@
 <div class="bg-particles"></div>
 
 <header>
-    <h1 id="main-title">Jogos Finalizados</h1>
-    <p class="subtitle">A partir de 2025</p>
+    <div class="header-banner">
+        <video autoplay loop muted playsinline class="banner-video">
+            <source src="GmRhChcaQAAZKkJ.mp4" type="video/mp4">
+        </video>
+        <div class="banner-content">
+            <h1 id="main-title">Jogos Finalizados</h1>
+            <p class="subtitle">A sua base para zeramentos de 2025</p>
+        </div>
+    </div>
     
     <div class="controls-bar">
         <button id="btn-led" class="btn-action" onclick="toggleLED()">💡 LEDs: ON</button>
@@ -476,7 +526,7 @@
             document.getElementById('library').style.display = 'flex';
             renderLibrary();
         } catch (err) {
-            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor.";
+            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor. Configure as chaves Supabase corretamente.";
             document.getElementById('library').style.display = 'flex';
         }
     }
@@ -728,7 +778,6 @@
                     const img = document.createElement('img'); img.src = sig.image_data;
                     div.appendChild(img); 
                     
-                    // BOTÃO DE DELETAR ASSINATURA (SÓ APARECE NO MODO DEUS)
                     if(isAdmin) {
                         const delBtn = document.createElement('button');
                         delBtn.className = 'sig-delete-btn';
@@ -757,7 +806,6 @@
     }
 
     async function saveSignature() {
-        // SISTEMA ANTI-SPAM (Limite de 2 assinaturas por pessoa)
         let sigCount = parseInt(localStorage.getItem('mural_sig_count') || '0');
         if (sigCount >= 2 && !isAdmin) {
             alert("Você já deixou 2 assinaturas no mural! Vamos dar espaço para a comunidade.");
@@ -775,7 +823,6 @@
             const { error } = await db.from('signatures').insert([{ image_data: imageData }]);
             if(error) throw error;
             
-            // Adiciona +1 no contador de assinaturas do usuário
             if(!isAdmin) {
                 sigCount++;
                 localStorage.setItem('mural_sig_count', sigCount.toString());
