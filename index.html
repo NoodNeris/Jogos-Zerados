@@ -51,59 +51,63 @@
             100% { transform: translateY(-50vh) translateX(-50vw); }
         }
 
-        /* === NOVO BANNER ESTILO STEAM === */
-        header { text-align: center; padding: 20px 20px 0; position: relative; z-index: 50; }
+        /* === BANNER ESTILO STEAM (CORRIGIDO) === */
+        header { text-align: center; padding: 30px 20px 0; position: relative; z-index: 50; }
         
         .header-banner {
             position: relative;
             width: 100%;
-            max-width: 1500px;
+            max-width: 1000px; /* Mais contido, como o da Steam */
             margin: 0 auto 30px auto;
-            height: 280px;
-            border-radius: 16px;
+            height: 220px;
+            border-radius: 12px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(212,175,55,0.2);
-            border: 2px solid #332014;
-            border-bottom: 4px solid var(--gold);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8), 0 0 15px rgba(212,175,55,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .banner-video {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
             z-index: 1;
-            /* Escurece o vídeo para o texto brilhar mais */
-            filter: brightness(0.4) contrast(1.2); 
+            object-fit: cover;
+            /* Tirei o brilho super escuro para o vídeo aparecer com as cores reais */
         }
 
         .banner-content {
             position: relative;
             z-index: 2;
-            padding: 20px 40px;
-            background: radial-gradient(circle, rgba(0,0,0,0.6) 0%, transparent 80%);
-            border-radius: 20px;
+            padding: 15px 40px;
+            /* Leve vidro fosco (glassmorphism) atrás do texto para dar leitura no vídeo */
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         h1 {
-            font-family: 'Cinzel', serif; font-size: clamp(2rem, 5vw, 4rem); font-weight: 800;
-            color: var(--gold); text-transform: uppercase; letter-spacing: 4px;
-            text-shadow: 0px 8px 15px rgba(0,0,0,1), 0 0 30px var(--gold);
-            cursor: pointer; display: inline-block; margin-bottom: 5px;
+            font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 4vw, 3.5rem); font-weight: 800;
+            color: #fff; text-transform: uppercase; letter-spacing: 4px;
+            text-shadow: 0px 4px 10px rgba(0,0,0,1), 0 0 15px var(--gold);
+            margin-bottom: 5px;
             transition: 0.3s;
         }
-        h1:hover { text-shadow: 0px 10px 20px rgba(0,0,0,1), 0 0 50px var(--gold); transform: scale(1.02); }
         
         .subtitle {
-            color: #ddd; font-family: 'Montserrat', sans-serif; font-size: 1.1rem;
-            font-style: italic; letter-spacing: 1px;
+            color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 1.1rem;
+            font-style: italic; letter-spacing: 2px;
             text-shadow: 0 2px 5px #000;
+            font-weight: bold;
         }
         /* ================================ */
 
@@ -355,7 +359,7 @@
             .mural-header { flex-direction: column; text-align: center; }
             .mural-header-info { text-align: center; }
             .mural-actions { flex-direction: row; }
-            .header-banner { height: 200px; border-radius: 0; }
+            .header-banner { height: 180px; border-radius: 0; border-left: none; border-right: none;}
         }
         @media (max-width: 600px) {
             .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; margin-bottom: 15px; }
@@ -366,7 +370,7 @@
             .platform-badge { font-size: 0.6rem; bottom: -22px; }
             .lightbox-close { top: -10px; right: 0; }
             .sig-item img { max-width: 100%; }
-            .header-banner { height: 180px; }
+            .header-banner { height: 150px; }
         }
     </style>
 </head>
@@ -379,9 +383,10 @@
         <video autoplay loop muted playsinline class="banner-video">
             <source src="GmRhChcaQAAZKkJ.mp4" type="video/mp4">
         </video>
+        
         <div class="banner-content">
             <h1 id="main-title">Jogos Finalizados</h1>
-            <p class="subtitle">A sua base para zeramentos de 2025</p>
+            <p class="subtitle">A partir de 2025</p>
         </div>
     </div>
     
