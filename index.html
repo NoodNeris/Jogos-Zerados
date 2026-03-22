@@ -11,9 +11,10 @@
 
     <style>
         :root {
-            --wood-dark: rgba(10, 7, 5, 0.85); 
-            --wood-back: rgba(20, 13, 9, 0.9);
-            --wood-floor: #332014;
+            /* Fundo da estante sólido com transparência. Removemos o blur para evitar o bug de jogos invisíveis no Chrome */
+            --wood-dark: rgba(15, 10, 8, 0.85); 
+            --wood-back: rgba(20, 13, 9, 0.7);
+            --wood-floor: rgba(51, 32, 20, 0.9);
             --gold: #d4af37;
             --gold-glow: rgba(212, 175, 55, 0.4);
             --case-depth: 45px;
@@ -33,67 +34,92 @@
             background-color: #000;
         }
 
-        .video-background {
+        /* === VÍDEO DE FUNDO (TELA CHEIA E FIXO) === */
+        .video-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -2;
-            overflow: hidden;
+            z-index: -3; 
         }
-        
-        .video-background video {
+        .video-container video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
+        /* Degradê para escurecer o rodapé da tela, facilitando a leitura dos jogos */
         .video-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(5,5,5,0.85) 100%);
-            z-index: -1;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(5,5,5,0.95) 100%);
+            z-index: -2;
         }
 
+        .bg-particles {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-particles::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 200vw; height: 200vh;
+            background-image: radial-gradient(var(--gold) 1px, transparent 1px);
+            background-size: 80px 80px; opacity: 0.08;
+            animation: floatBG 90s linear infinite;
+        }
+        @keyframes floatBG {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-50vh) translateX(-50vw); }
+        }
+
+        /* === CABEÇALHO IMERSIVO (TÍTULO NO CANTO, CLEAN) === */
         .main-header { 
             width: 100%;
-            min-height: 50vh; 
+            max-width: 1500px;
+            margin: 0 auto;
+            min-height: 55vh; 
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
+            justify-content: flex-end; /* Empurra pra baixo */
+            align-items: flex-start; /* Alinha na esquerda */
+            text-align: left;
+            padding: 0 20px 20px 20px; /* Alinhado com as margens da estante */
             position: relative;
             z-index: 10;
         }
 
         h1 {
             font-family: 'Cinzel', serif; 
-            font-size: clamp(3rem, 7vw, 6rem); 
+            font-size: clamp(2rem, 5vw, 3.5rem); /* Fonte Menor e Elegante */
             font-weight: 800;
-            color: #fff; 
+            color: var(--gold); 
             text-transform: uppercase; 
-            letter-spacing: 8px;
-            text-shadow: 0px 5px 25px rgba(0,0,0,0.9), 0 0 50px rgba(212, 175, 55, 0.5);
-            margin-bottom: 10px;
-            transition: 0.3s;
+            letter-spacing: 4px;
+            -webkit-text-stroke: 1px rgba(0,0,0,0.8); /* Borda Suave */
+            text-shadow: 0px 4px 10px rgba(0,0,0,0.9), 0 0 20px var(--gold-glow);
+            margin-bottom: 5px;
+            transition: transform 0.3s ease, text-shadow 0.3s ease;
+            transform-origin: left;
         }
-        h1:hover { text-shadow: 0px 5px 20px rgba(0,0,0,1), 0 0 70px rgba(212, 175, 55, 1); transform: scale(1.02); }
+        h1:hover { text-shadow: 0px 6px 15px rgba(0,0,0,1), 0 0 30px var(--gold); transform: scale(1.02); }
         
         .subtitle {
-            color: var(--gold); 
+            color: #eee; 
             font-family: 'Montserrat', sans-serif; 
-            font-size: clamp(1.2rem, 2vw, 1.8rem);
+            font-size: clamp(1rem, 2vw, 1.2rem);
             font-style: italic; 
-            letter-spacing: 4px; 
+            letter-spacing: 2px; 
             font-weight: bold;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.9);
-            margin-bottom: 40px;
+            text-shadow: 0 2px 8px rgba(0,0,0,1);
+            margin-bottom: 10px;
         }
 
+        /* === BARRA DE CONTROLES (MESMO TAMANHO DA ESTANTE) === */
         .controls-bar {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto 40px auto;
             background: rgba(15, 10, 5, 0.6);
             backdrop-filter: blur(12px);
             padding: 15px 30px; 
@@ -102,7 +128,8 @@
             border: 1px solid rgba(212, 175, 55, 0.2);
             box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
             flex-wrap: wrap;
-            margin-bottom: 40px;
+            z-index: 10;
+            position: relative;
         }
         .controls-bar label { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #fff; text-shadow: 0 2px 5px #000;}
         .controls-bar select {
@@ -119,8 +146,9 @@
         }
         .btn-action:hover { background: rgba(30,30,30,0.8); border-color: var(--gold); }
 
-        #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-bottom: 40px; text-shadow: 0 0 15px #000; padding: 0 20px;}
+        #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-bottom: 30px; text-shadow: 0 0 10px #000; padding: 0 20px; position: relative; z-index: 10;}
 
+        /* A ESTANTE VOLUMÉTRICA */
         .library-container {
             width: 100%; max-width: 1500px; margin: 0 auto;
             display: flex; flex-direction: column; gap: 0; padding: 0 20px 60px;
@@ -131,6 +159,7 @@
             background: var(--wood-dark); 
             border-radius: 8px; display: none;
             z-index: 10;
+            position: relative;
         }
 
         .shelf-row {
@@ -144,7 +173,7 @@
 
         .shelf-row::before {
             content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
-            background: linear-gradient(to top, var(--wood-floor), #0a0604);
+            background: linear-gradient(to top, var(--wood-floor), transparent);
             transform-origin: bottom; transform: rotateX(65deg);
             box-shadow: inset 0 30px 60px rgba(0,0,0,0.9); z-index: 0;
             border-top: 2px solid rgba(255,255,255,0.03); transition: box-shadow 0.4s;
@@ -155,8 +184,19 @@
             transform-style: preserve-3d; padding: 0 40px; flex-wrap: nowrap; justify-content: center;
         }
 
-        .game-case-wrapper { width: 190px; height: 270px; perspective: 1200px; cursor: pointer; position: relative; margin-top: 30px; }
+        /* ANIMAÇÃO DE CASCATA SUAVE NOS JOGOS */
+        @keyframes gameAppear {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .game-case-wrapper { 
+            width: 190px; height: 270px; perspective: 1200px; cursor: pointer; position: relative; margin-top: 30px; 
+            animation: gameAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; 
+        }
+        
         .game-case-animator { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
+        
         .case-shadow {
             position: absolute; bottom: -15px; left: -20px; width: 140%; height: 40px;
             background: radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, transparent 70%);
@@ -220,6 +260,7 @@
         }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-150px) scale(0); opacity: 0; } }
 
+        /* MODAL E DVD GIGANTE */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content { background: linear-gradient(145deg, #1f1f1f, #0a0a0a); width: 1100px; max-width: 95%; height: 600px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 50px rgba(0,0,0,0.8); display: flex; position: relative; transform: scale(0.9) translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
@@ -272,13 +313,22 @@
         .print-thumbnail { width: 160px; height: 90px; object-fit: cover; border: 2px solid #444; border-radius: 6px; cursor: pointer; transition: 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-shrink: 0; }
         .print-thumbnail:hover { border-color: var(--gold); transform: scale(1.05); box-shadow: 0 8px 20px rgba(212,175,55,0.4); }
 
+        /* PRINTS LIGHTBOX (Sem borda amarela) */
         .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(10px); }
         .lightbox-overlay.active { opacity: 1; pointer-events: all; }
         .lightbox-content { position: relative; max-width: 90%; max-height: 90%; }
-        .lightbox-content img { max-width: 100%; max-height: 90vh; border: 2px solid var(--gold); border-radius: 8px; box-shadow: 0 0 40px rgba(212,175,55,0.3); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        .lightbox-content img { 
+            max-width: 100%; max-height: 90vh; 
+            border-radius: 10px; 
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9); 
+            transform: scale(0.95); 
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
         .lightbox-overlay.active img { transform: scale(1); }
-        .lightbox-close { position: absolute; top: -20px; right: -20px; background: #e63946; color: #fff; border: 2px solid #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
-        .lightbox-close:hover { transform: scale(1.2) rotate(90deg); }
+        
+        .lightbox-close { position: absolute; top: -20px; right: -20px; background: rgba(0,0,0,0.7); color: #fff; border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.8); backdrop-filter: blur(5px);}
+        .lightbox-close:hover { background: var(--gold); color: #000; transform: scale(1.1); border-color: var(--gold); }
 
         /* Mural de Assinaturas */
         .mural-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.4s ease; z-index: 1000; }
@@ -321,6 +371,8 @@
         .edit-btn { background: var(--gold); color: #000; }
         .edit-btn:hover { transform: scale(1.2); }
 
+        .footer-credits { text-align: center; padding: 30px; color: #666; font-size: 0.75rem; font-family: 'Montserrat', sans-serif; letter-spacing: 2px; margin-top: auto; position: relative; z-index: 10; text-shadow: 0 2px 4px #000;}
+
         @media (max-width: 900px) {
             .modal-content, .mural-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
             .modal-image-container, .mural-draw-area { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; }
@@ -331,6 +383,9 @@
             .mural-header { flex-direction: column; text-align: center; }
             .mural-header-info { text-align: center; }
             .mural-actions { flex-direction: row; }
+            .main-header { align-items: center; text-align: center; min-height: 40vh;}
+            h1 { font-size: clamp(2.2rem, 8vw, 3rem); text-align: center; transform-origin: center;}
+            .controls-bar { width: 95%; }
         }
         @media (max-width: 600px) {
             .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; margin-bottom: 15px; }
@@ -359,7 +414,7 @@
 </header>
     
 <div class="controls-bar">
-    <button class="btn-action" onclick="openMural()">✍️ Mural da Comunidade</button>
+    <button class="btn-action" onclick="openMural()">✍️ Mural de Assinaturas</button>
     
     <label for="sort-select" style="margin-left: 10px;">Organizar estante:</label>
     <select id="sort-select" onchange="handleSort()">
@@ -371,6 +426,10 @@
 
 <div id="app-status">Conectando ao Banco de Dados...</div>
 <div class="library-container" id="library"></div>
+
+<footer class="footer-credits">
+    CRIADO E PROGRAMADO POR NOOD32
+</footer>
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
@@ -418,13 +477,13 @@
         
         <div class="mural-header">
             <div class="mural-header-info">
-                <h2>Mural da Comunidade</h2>
+                <h2>Mural de Assinaturas</h2>
                 <p>Deixe sua marca no site. Desenhe sua assinatura.</p>
             </div>
             <canvas id="signature-pad" width="300" height="150"></canvas>
             <div class="mural-actions">
-                <button class="admin-btn" id="btn-save-sig" onclick="saveSignature()">Salvar Marca</button>
-                <button class="admin-btn danger" onclick="clearCanvas()">Limpar</button>
+                <button class="btn-action" style="justify-content: center;" id="btn-save-sig" onclick="saveSignature()">Salvar Marca</button>
+                <button class="btn-action" style="justify-content: center; border-color: #e63946;" onclick="clearCanvas()">Limpar</button>
             </div>
         </div>
 
@@ -485,7 +544,7 @@
             document.getElementById('library').style.display = 'flex';
             renderLibrary();
         } catch (err) {
-            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor.";
+            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor. Verifique o Supabase.";
             document.getElementById('library').style.display = 'flex';
         }
     }
