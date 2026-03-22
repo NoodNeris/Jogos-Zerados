@@ -51,23 +51,28 @@
             100% { transform: translateY(-50vh) translateX(-50vw); }
         }
 
-        /* === BANNER ESTILO STEAM (CORRIGIDO) === */
-        header { text-align: center; padding: 30px 20px 0; position: relative; z-index: 50; }
+        /* === BANNER ESTILO STEAM (IMERSIVO) === */
+        header { 
+            width: 100%;
+            position: relative; 
+            z-index: 50; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+        }
         
         .header-banner {
             position: relative;
             width: 100%;
-            max-width: 1000px; /* Mais contido, como o da Steam */
-            margin: 0 auto 30px auto;
-            height: 220px;
-            border-radius: 12px;
-            overflow: hidden;
+            height: 50vh; /* Altura imersiva baseada na tela do usuário */
+            min-height: 350px;
+            max-height: 550px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8), 0 0 15px rgba(212,175,55,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
         }
 
         .banner-video {
@@ -76,46 +81,56 @@
             left: 50%;
             min-width: 100%;
             min-height: 100%;
-            width: auto;
-            height: auto;
             transform: translate(-50%, -50%);
             z-index: 1;
             object-fit: cover;
-            /* Tirei o brilho super escuro para o vídeo aparecer com as cores reais */
+        }
+
+        /* A Máscara que cria a transição invisível para o preto */
+        .banner-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at center, transparent 10%, rgba(5,5,5,0.7) 100%),
+                linear-gradient(to bottom, rgba(5,5,5,0) 60%, #050505 100%);
+            z-index: 2;
         }
 
         .banner-content {
             position: relative;
-            z-index: 2;
-            padding: 15px 40px;
-            /* Leve vidro fosco (glassmorphism) atrás do texto para dar leitura no vídeo */
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(4px);
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
+            z-index: 3;
+            text-align: center;
+            margin-top: -30px; /* Equilibra visualmente a posição vertical */
         }
 
         h1 {
-            font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 4vw, 3.5rem); font-weight: 800;
-            color: #fff; text-transform: uppercase; letter-spacing: 4px;
-            text-shadow: 0px 4px 10px rgba(0,0,0,1), 0 0 15px var(--gold);
+            font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 800;
+            color: #fff; text-transform: uppercase; letter-spacing: 6px;
+            text-shadow: 0px 5px 20px rgba(0,0,0,1), 0 0 30px rgba(212, 175, 55, 0.5);
             margin-bottom: 5px;
             transition: 0.3s;
         }
+        h1:hover { text-shadow: 0px 5px 20px rgba(0,0,0,1), 0 0 50px rgba(212, 175, 55, 1); transform: scale(1.02); }
         
         .subtitle {
-            color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 1.1rem;
-            font-style: italic; letter-spacing: 2px;
-            text-shadow: 0 2px 5px #000;
-            font-weight: bold;
+            color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 1.2rem;
+            font-style: italic; letter-spacing: 3px; font-weight: bold;
+            text-shadow: 0 4px 10px rgba(0,0,0,1);
         }
         /* ================================ */
 
         .controls-bar {
-            background: linear-gradient(to right, transparent, rgba(30, 20, 10, 0.8), transparent);
-            padding: 15px; display: flex; justify-content: center; gap: 15px; align-items: center;
-            border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 40px; flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+            margin-top: -40px; /* Flutua metade por cima do vídeo e metade no site */
+            background: rgba(15, 10, 5, 0.75);
+            backdrop-filter: blur(10px); /* Efeito de vidro esfumaçado */
+            padding: 15px 30px; 
+            display: flex; justify-content: center; gap: 20px; align-items: center;
+            border-radius: 12px; 
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9); 
+            flex-wrap: wrap;
         }
         .controls-bar label { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #aaa; }
         .controls-bar select {
@@ -136,7 +151,7 @@
             text-shadow: 0 0 5px var(--led-color);
         }
 
-        #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-top: 50px; text-shadow: 0 0 10px var(--gold); padding: 0 20px;}
+        #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-top: 20px; text-shadow: 0 0 10px var(--gold); padding: 0 20px;}
 
         .library-container {
             width: 100%; max-width: 1500px; margin: 0 auto;
@@ -359,7 +374,8 @@
             .mural-header { flex-direction: column; text-align: center; }
             .mural-header-info { text-align: center; }
             .mural-actions { flex-direction: row; }
-            .header-banner { height: 180px; border-radius: 0; border-left: none; border-right: none;}
+            .header-banner { min-height: 250px; }
+            h1 { font-size: 2.5rem; }
         }
         @media (max-width: 600px) {
             .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; margin-bottom: 15px; }
@@ -370,7 +386,6 @@
             .platform-badge { font-size: 0.6rem; bottom: -22px; }
             .lightbox-close { top: -10px; right: 0; }
             .sig-item img { max-width: 100%; }
-            .header-banner { height: 150px; }
         }
     </style>
 </head>
@@ -383,7 +398,7 @@
         <video autoplay loop muted playsinline class="banner-video">
             <source src="GmRhChcaQAAZKkJ.mp4" type="video/mp4">
         </video>
-        
+        <div class="banner-overlay"></div>
         <div class="banner-content">
             <h1 id="main-title">Jogos Finalizados</h1>
             <p class="subtitle">A partir de 2025</p>
@@ -531,7 +546,7 @@
             document.getElementById('library').style.display = 'flex';
             renderLibrary();
         } catch (err) {
-            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor. Configure as chaves Supabase corretamente.";
+            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor.";
             document.getElementById('library').style.display = 'flex';
         }
     }
