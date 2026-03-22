@@ -11,8 +11,8 @@
 
     <style>
         :root {
-            --wood-dark: #0a0705;
-            --wood-back: #140d09;
+            --wood-dark: rgba(10, 7, 5, 0.85); /* Fundo da estante levemente transparente */
+            --wood-back: rgba(20, 13, 9, 0.9);
             --wood-floor: #332014;
             --gold: #d4af37;
             --gold-glow: rgba(212, 175, 55, 0.4);
@@ -24,7 +24,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: #050505;
             font-family: 'Montserrat', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
@@ -32,146 +31,124 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            background-color: #000; /* Fundo preto caso o vídeo demore a carregar */
         }
 
-        .bg-particles {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1; pointer-events: none;
-            background: radial-gradient(circle at 50% 0%, #1a100a 0%, #030303 80%);
+        /* === VÍDEO DE FUNDO TELA CHEIA === */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
             overflow: hidden;
         }
-        .bg-particles::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 200vw; height: 200vh;
-            background-image: radial-gradient(var(--gold) 1px, transparent 1px);
-            background-size: 80px 80px; opacity: 0.05;
-            animation: floatBG 90s linear infinite;
-        }
-        @keyframes floatBG {
-            0% { transform: translateY(0) translateX(0); }
-            100% { transform: translateY(-50vh) translateX(-50vw); }
+        
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        /* === BANNER ESTILO STEAM (IMERSIVO) === */
-        header { 
-            width: 100%;
-            position: relative; 
-            z-index: 50; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 40px;
+        /* Camada escura por cima do vídeo para dar contraste aos jogos e textos */
+        .video-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(5,5,5,0.85) 100%);
+            z-index: -1;
         }
-        
-        .header-banner {
-            position: relative;
+
+        /* === CABEÇALHO IMERSIVO === */
+        .main-header { 
             width: 100%;
-            height: 50vh; 
-            min-height: 380px;
-            max-height: 550px;
+            min-height: 50vh; /* Ocupa metade da tela inicialmente */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-        }
-
-        .banner-video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            object-fit: cover;
-        }
-
-        /* Transição suave do vídeo para o fundo do site */
-        .banner-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(5,5,5,0) 50%, #050505 100%);
-            z-index: 2;
-        }
-
-        /* Efeito de Vidro Fosco Escuro para o Título ficar legível na neve */
-        .banner-content {
-            position: relative;
-            z-index: 3;
             text-align: center;
-            margin-top: -30px; 
-            background: rgba(0, 0, 0, 0.45);
-            padding: 30px 60px;
-            border-radius: 16px;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            position: relative;
+            z-index: 10;
         }
 
         h1 {
-            font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 800;
-            color: #fff; text-transform: uppercase; letter-spacing: 6px;
-            text-shadow: 0px 5px 20px rgba(0,0,0,1), 0 0 30px rgba(212, 175, 55, 0.6);
-            margin-bottom: 5px;
+            font-family: 'Cinzel', serif; 
+            font-size: clamp(3rem, 7vw, 6rem); 
+            font-weight: 800;
+            color: #fff; 
+            text-transform: uppercase; 
+            letter-spacing: 8px;
+            /* Brilho difuso para integrar ao vídeo */
+            text-shadow: 0px 5px 25px rgba(0,0,0,0.9), 0 0 50px rgba(212, 175, 55, 0.5);
+            margin-bottom: 10px;
             transition: 0.3s;
         }
-        h1:hover { text-shadow: 0px 5px 20px rgba(0,0,0,1), 0 0 50px rgba(212, 175, 55, 1); transform: scale(1.02); }
+        h1:hover { text-shadow: 0px 5px 20px rgba(0,0,0,1), 0 0 70px rgba(212, 175, 55, 1); transform: scale(1.02); }
         
         .subtitle {
-            color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 1.2rem;
-            font-style: italic; letter-spacing: 3px; font-weight: bold;
-            text-shadow: 0 4px 10px rgba(0,0,0,1);
+            color: var(--gold); 
+            font-family: 'Montserrat', sans-serif; 
+            font-size: clamp(1.2rem, 2vw, 1.8rem);
+            font-style: italic; 
+            letter-spacing: 4px; 
+            font-weight: bold;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+            margin-bottom: 40px;
         }
-        /* ================================ */
 
+        /* === BARRA DE CONTROLES FLUTUANTE === */
         .controls-bar {
-            position: relative;
-            z-index: 10;
-            margin-top: -40px; 
-            background: rgba(15, 10, 5, 0.75);
-            backdrop-filter: blur(10px); 
+            background: rgba(15, 10, 5, 0.6);
+            backdrop-filter: blur(12px);
             padding: 15px 30px; 
             display: flex; justify-content: center; gap: 20px; align-items: center;
             border-radius: 12px; 
             border: 1px solid rgba(212, 175, 55, 0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
             flex-wrap: wrap;
+            margin-bottom: 40px;
         }
-        .controls-bar label { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #aaa; }
+        .controls-bar label { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #fff; text-shadow: 0 2px 5px #000;}
         .controls-bar select {
-            background: #111; color: var(--gold); border: 1px solid var(--gold);
+            background: rgba(0,0,0,0.6); color: var(--gold); border: 1px solid var(--gold);
             padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-weight: bold;
-            border-radius: 4px; cursor: pointer; outline: none; box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: 0.3s;
+            border-radius: 4px; cursor: pointer; outline: none; transition: 0.3s;
         }
-        .controls-bar select:hover { background: #222; box-shadow: 0 0 15px var(--gold-glow); }
+        .controls-bar select:hover { background: rgba(30,30,30,0.8); box-shadow: 0 0 15px var(--gold-glow); }
 
         .btn-action {
-            background: #111; color: #fff; border: 1px solid #555;
+            background: rgba(0,0,0,0.6); color: #fff; border: 1px solid #555;
             padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-weight: bold;
             border-radius: 4px; cursor: pointer; outline: none; transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
-        .btn-action:hover { background: #222; border-color: var(--gold); }
+        .btn-action:hover { background: rgba(30,30,30,0.8); border-color: var(--gold); }
         .btn-action.active {
             border-color: var(--led-color); color: var(--led-color); box-shadow: 0 0 15px var(--led-color);
-            text-shadow: 0 0 5px var(--led-color);
+            text-shadow: 0 0 5px var(--led-color); background: rgba(0,0,0,0.8);
         }
 
-        #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-top: 20px; text-shadow: 0 0 10px var(--gold); padding: 0 20px;}
+        #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-bottom: 40px; text-shadow: 0 0 15px #000; padding: 0 20px;}
 
+        /* A ESTANTE VOLUMÉTRICA */
         .library-container {
             width: 100%; max-width: 1500px; margin: 0 auto;
             display: flex; flex-direction: column; gap: 0; padding: 0 20px 60px;
             border-left: clamp(10px, 3vw, 35px) solid #140a05; 
             border-right: clamp(10px, 3vw, 35px) solid #140a05; 
             border-top: clamp(10px, 3vw, 35px) solid #140a05;
-            box-shadow: 0 50px 100px rgba(0,0,0,1), inset 0 0 60px rgba(0,0,0,0.9);
-            background: var(--wood-dark); border-radius: 8px; display: none;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8), inset 0 0 60px rgba(0,0,0,0.8);
+            background: var(--wood-dark); 
+            backdrop-filter: blur(5px); /* Efeito de vidro na estante para o video transparecer levemente */
+            border-radius: 8px; display: none;
+            z-index: 10;
         }
 
         .shelf-row {
             position: relative; width: 100%; min-height: 400px;
             display: flex; justify-content: center; align-items: flex-end;
-            padding-bottom: 25px; border-bottom: 45px solid #1c1109;
+            padding-bottom: 25px; border-bottom: 45px solid rgba(28, 17, 9, 0.95);
             box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8);
             background: linear-gradient(to bottom, transparent, var(--wood-back));
             perspective: 1400px; z-index: 1; transition: box-shadow 0.4s;
@@ -379,8 +356,8 @@
             .mural-header { flex-direction: column; text-align: center; }
             .mural-header-info { text-align: center; }
             .mural-actions { flex-direction: row; }
-            .header-banner { min-height: 250px; }
-            h1 { font-size: 2.5rem; }
+            h1 { font-size: 2.8rem; }
+            .main-header { min-height: 35vh; padding-top: 60px; }
         }
         @media (max-width: 600px) {
             .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; margin-bottom: 15px; }
@@ -396,32 +373,29 @@
 </head>
 <body>
 
-<div class="bg-particles"></div>
+<div class="video-background">
+    <video autoplay loop muted playsinline>
+        <source src="GmRhChcaQAAZKkJ.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+</div>
 
-<header>
-    <div class="header-banner">
-        <video autoplay loop muted playsinline class="banner-video">
-            <source src="sledding-game.3840x2160.mp4" type="video/mp4">
-        </video>
-        <div class="banner-overlay"></div>
-        <div class="banner-content">
-            <h1 id="main-title">Jogos Finalizados</h1>
-            <p class="subtitle">A partir de 2025</p>
-        </div>
-    </div>
-    
-    <div class="controls-bar">
-        <button id="btn-led" class="btn-action" onclick="toggleLED()">💡 LEDs: ON</button>
-        <button class="btn-action" onclick="openMural()">✍️ Mural de Assinaturas</button>
-        
-        <label for="sort-select" style="margin-left: 10px;">Organizar estante:</label>
-        <select id="sort-select" onchange="handleSort()">
-            <option value="recent">Mais Recentes</option>
-            <option value="score">Maior Nota</option>
-            <option value="az">A - Z</option>
-        </select>
-    </div>
+<header class="main-header">
+    <h1 id="main-title">Jogos Finalizados</h1>
+    <p class="subtitle">A partir de 2025</p>
 </header>
+    
+<div class="controls-bar">
+    <button id="btn-led" class="btn-action" onclick="toggleLED()">💡 LEDs: ON</button>
+    <button class="btn-action" onclick="openMural()">✍️ Mural de Assinaturas</button>
+    
+    <label for="sort-select" style="margin-left: 10px;">Organizar estante:</label>
+    <select id="sort-select" onchange="handleSort()">
+        <option value="recent">Mais Recentes</option>
+        <option value="score">Maior Nota</option>
+        <option value="az">A - Z</option>
+    </select>
+</div>
 
 <div id="app-status">Conectando ao Banco de Dados...</div>
 <div class="library-container" id="library"></div>
