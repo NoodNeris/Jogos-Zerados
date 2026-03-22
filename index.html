@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -24,7 +23,6 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* === FUNDO MODERNO ANIMADO === */
         body {
             background-color: #050505;
             font-family: 'Montserrat', sans-serif;
@@ -32,6 +30,8 @@
             overflow-x: hidden;
             color: #fff;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .bg-particles {
@@ -51,7 +51,6 @@
             100% { transform: translateY(-50vh) translateX(-50vw); }
         }
 
-        /* CABEÇALHO */
         header { text-align: center; padding: 40px 20px 20px; position: relative; z-index: 50; }
         h1 {
             font-family: 'Cinzel', serif; font-size: clamp(2rem, 5vw, 4rem); font-weight: 800;
@@ -81,24 +80,22 @@
         }
         .controls-bar select:hover { background: #222; box-shadow: 0 0 15px var(--gold-glow); }
 
-        .btn-led, .btn-mural {
+        .btn-action {
             background: #111; color: #fff; border: 1px solid #555;
             padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-weight: bold;
             border-radius: 4px; cursor: pointer; outline: none; transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
-        .btn-led:hover, .btn-mural:hover { background: #222; border-color: var(--gold); }
-        .btn-led.active {
+        .btn-action:hover { background: #222; border-color: var(--gold); }
+        .btn-action.active {
             border-color: var(--led-color); color: var(--led-color); box-shadow: 0 0 15px var(--led-color);
             text-shadow: 0 0 5px var(--led-color);
         }
 
-        /* Loading */
-        #loading-msg { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-top: 50px; text-shadow: 0 0 10px var(--gold); padding: 0 20px;}
+        #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-top: 50px; text-shadow: 0 0 10px var(--gold); padding: 0 20px;}
 
-        /* A ESTANTE VOLUMÉTRICA */
         .library-container {
             width: 100%; max-width: 1500px; margin: 0 auto;
-            display: flex; flex-direction: column; gap: 0; padding: 0 20px 100px;
+            display: flex; flex-direction: column; gap: 0; padding: 0 20px 60px;
             border-left: clamp(10px, 3vw, 35px) solid #140a05; 
             border-right: clamp(10px, 3vw, 35px) solid #140a05; 
             border-top: clamp(10px, 3vw, 35px) solid #140a05;
@@ -136,7 +133,6 @@
             transform-style: preserve-3d; padding: 0 40px; flex-wrap: nowrap; justify-content: center;
         }
 
-        /* CAIXA DA PRATELEIRA */
         .game-case-wrapper { width: 190px; height: 270px; perspective: 1200px; cursor: pointer; position: relative; margin-top: 30px; }
         .game-case-animator { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
         .case-shadow {
@@ -183,7 +179,6 @@
         }
         .game-case-wrapper:hover .platform-badge { color: var(--gold); border-color: var(--gold); background: rgba(10, 5, 2, 1); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
 
-        /* OBRA-PRIMA */
         .masterpiece .game-case-animator { animation: floatMasterpiece 4s ease-in-out infinite; }
         @keyframes floatMasterpiece { 0%, 100% { transform: translateY(-5px); } 50% { transform: translateY(-18px); } }
         .masterpiece:hover .game-case { transform: scale(1.05) rotateY(35deg) translateZ(40px); }
@@ -203,24 +198,20 @@
         }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-150px) scale(0); opacity: 0; } }
 
-        /* === MODAL E DVD GIGANTE === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content { background: linear-gradient(145deg, #1f1f1f, #0a0a0a); width: 1100px; max-width: 95%; height: 600px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 50px rgba(0,0,0,0.8); display: flex; position: relative; transform: scale(0.9) translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
         .modal-overlay.active .modal-content { transform: scale(1) translateY(0); opacity: 1; }
-        
         .modal-masterpiece .modal-content { border: 2px solid var(--gold); box-shadow: 0 0 120px rgba(212, 175, 55, 0.3), inset 0 0 60px rgba(212, 175, 55, 0.1); }
 
         .wax-seal { position: absolute; top: 35px; right: 35px; width: 140px; height: 140px; background: radial-gradient(circle at 35% 35%, #e63946, #b00000, #5c0000); border-radius: 50%; display: flex; justify-content: center; align-items: center; text-align: center; color: #ffe8e0; font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 800; line-height: 1.1; transform: rotate(-15deg) scale(0); z-index: 50; letter-spacing: 1px; box-shadow: inset 0 0 15px rgba(50,0,0,0.9), inset 0 0 0 5px rgba(255,100,100,0.3), 0 15px 30px rgba(0,0,0,0.8); border: 2px solid #540000; text-shadow: 1px 2px 3px rgba(0,0,0,0.9); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s, background 0.4s, box-shadow 0.4s; }
         .modal-overlay.active .wax-seal { transform: rotate(-15deg) scale(1); }
         .wax-seal::before { content: ''; position: absolute; width: 112%; height: 112%; border-radius: 40% 60% 55% 45% / 55% 45% 60% 40%; background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(130,0,0,0.8) 100%); border: 2px solid rgba(80,0,0,0.5); filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5)); transition: background 0.4s, border-color 0.4s; }
-
         .modal-masterpiece .wax-seal { background: radial-gradient(circle at 35% 35%, #ffdf00, #d4af37, #8b6508); color: #fff; border-color: #d4af37; box-shadow: inset 0 0 20px rgba(139, 101, 8, 0.9), inset 0 0 0 5px rgba(255, 223, 0, 0.5), 0 20px 40px rgba(212, 175, 55, 0.7); }
         .modal-masterpiece .wax-seal::before { background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(139, 101, 8, 0.8) 100%); border-color: rgba(212, 175, 55, 0.9); filter: drop-shadow(0 5px 10px rgba(212, 175, 55, 0.5)); }
 
         .modal-image-container { width: 45%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent); border-right: 1px solid #222; position: relative; perspective: 1500px; }
         .modal-dvd-case { width: 280px; height: 400px; position: relative; transform-style: preserve-3d; animation: modalFloat 7s ease-in-out infinite; filter: drop-shadow(-30px 40px 30px rgba(0,0,0,0.9)); }
-        @keyframes modalFloat { 0% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); } 50% { transform: translateY(-20px) rotateY(10deg) rotateX(-5deg); } 100% { transform: translateY(0px) rotateY(-15deg) rotateX(5deg); } }
         .dvd-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 4px 10px 10px 4px; }
         .dvd-front { transform: translateZ(calc(var(--modal-dvd-depth) / 2)); background: #000; overflow: hidden; border: 1px solid rgba(255,255,255,0.3); box-shadow: inset 3px 0 10px rgba(255,255,255,0.2); }
         .dvd-front img { width: 100%; height: 100%; object-fit: cover; }
@@ -249,16 +240,16 @@
         .modal-date { font-size: 1.1rem; color: #ccc; margin-bottom: 20px; font-weight: bold; }
         .modal-desc { font-size: 1.1rem; line-height: 1.6; color: #bbb; border-left: 3px solid var(--gold); padding-left: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 30px;}
 
-        /* === PRINTS (LIGHTBOX) === */
-        .print-thumbnail-container { display: none; margin-top: 10px; }
-        .print-thumbnail-container p { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: bold;}
-        .print-thumbnail { width: 180px; height: 100px; object-fit: cover; border: 2px solid #444; border-radius: 6px; cursor: pointer; transition: 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        /* Gallery de Prints */
+        .print-wrapper { display: none; margin-top: 10px; }
+        .print-wrapper h3 { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: bold;}
+        .prints-gallery { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; margin-top: 10px; }
+        .prints-gallery::-webkit-scrollbar { height: 6px; }
+        .prints-gallery::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+        .print-thumbnail { width: 160px; height: 90px; object-fit: cover; border: 2px solid #444; border-radius: 6px; cursor: pointer; transition: 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-shrink: 0; }
         .print-thumbnail:hover { border-color: var(--gold); transform: scale(1.05); box-shadow: 0 8px 20px rgba(212,175,55,0.4); }
 
-        .lightbox-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999;
-            display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(10px);
-        }
+        .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(10px); }
         .lightbox-overlay.active { opacity: 1; pointer-events: all; }
         .lightbox-content { position: relative; max-width: 90%; max-height: 90%; }
         .lightbox-content img { max-width: 100%; max-height: 90vh; border: 2px solid var(--gold); border-radius: 8px; box-shadow: 0 0 40px rgba(212,175,55,0.3); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -266,28 +257,27 @@
         .lightbox-close { position: absolute; top: -20px; right: -20px; background: #e63946; color: #fff; border: 2px solid #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
         .lightbox-close:hover { transform: scale(1.2) rotate(90deg); }
 
-        /* === MURAL DE ASSINATURAS === */
-        .mural-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000; }
+        /* Novo Mural de Assinaturas Estilo Painel */
+        .mural-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.4s ease; z-index: 1000; }
         .mural-overlay.active { opacity: 1; pointer-events: all; }
-        .mural-content { background: #111; width: 1000px; max-width: 95%; height: 600px; border-radius: 12px; border: 2px solid var(--gold); display: flex; position: relative; transform: translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
+        .mural-content { background: radial-gradient(circle at center, #1a1a1a 0%, #080808 100%); width: 1300px; max-width: 95%; height: 85vh; border-radius: 12px; border: 2px solid #333; box-shadow: 0 0 100px rgba(0,0,0,1); display: flex; flex-direction: column; position: relative; transform: translateY(30px); opacity: 0; transition: 0.4s ease; overflow: hidden; }
         .mural-overlay.active .mural-content { transform: translateY(0); opacity: 1; }
         
-        .mural-gallery { width: 50%; padding: 30px; border-right: 1px solid #333; overflow-y: auto; background: #0a0a0a;}
-        .mural-gallery h2 { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 20px; text-align: center; }
-        .signatures-grid { display: flex; flex-direction: column; gap: 15px; }
-        .sig-item { background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333; display: flex; justify-content: center;}
-        .sig-item img { max-width: 100%; filter: drop-shadow(0 0 5px rgba(212,175,55,0.5)); }
+        .mural-header { width: 100%; background: rgba(0,0,0,0.5); padding: 25px; border-bottom: 1px solid #333; display: flex; gap: 30px; align-items: center; justify-content: center; flex-wrap: wrap;}
+        .mural-header-info { text-align: right; }
+        .mural-header-info h2 { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 5px; font-size: 1.8rem;}
+        .mural-header-info p { font-family: 'Montserrat'; color: #888; font-size: 0.9rem;}
+        #signature-pad { background: #050505; border: 2px dashed #444; border-radius: 8px; cursor: crosshair; box-shadow: inset 0 0 20px rgba(0,0,0,1);}
+        .mural-actions { display: flex; flex-direction: column; gap: 10px; }
 
-        .mural-draw-area { width: 50%; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
-        .mural-draw-area h2 { font-family: 'Cinzel'; color: #fff; margin-bottom: 10px; }
-        .mural-draw-area p { font-family: 'Montserrat'; font-size: 0.9rem; color: #888; margin-bottom: 20px; text-align: center;}
-        #signature-pad { background: #222; border: 2px dashed #555; border-radius: 8px; cursor: crosshair; box-shadow: inset 0 0 20px rgba(0,0,0,1);}
-        .mural-actions { margin-top: 20px; display: flex; gap: 10px; }
+        .mural-gallery { width: 100%; flex-grow: 1; padding: 40px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; align-items: flex-start; align-content: flex-start;}
+        .sig-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.3s; }
+        .sig-item:hover { transform: scale(1.05); border-color: rgba(212,175,55,0.3); }
+        .sig-item img { max-width: 250px; height: auto; filter: drop-shadow(0 0 2px rgba(212,175,55,0.8)); }
 
         .close-btn { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.5); border: 1px solid #555; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; color: #aaa; cursor: pointer; z-index: 20; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
         .close-btn:hover { background: var(--gold); color: #000; transform: scale(1.1); box-shadow: 0 0 20px var(--gold-glow); border-color: var(--gold); }
 
-        /* PAINEL ADMIN */
         #admin-panel { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; border-top: 2px solid var(--gold); padding: 25px; z-index: 2000; box-shadow: 0 -15px 50px rgba(0,0,0,0.9); max-height: 60vh; overflow-y: auto; }
         .admin-controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;}
         .admin-btn { background: var(--gold); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Montserrat', sans-serif; transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; }
@@ -299,7 +289,6 @@
         #add-form { display: none; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
         #add-form input, #add-form select { padding: 10px; background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: 'Montserrat'; }
         
-        /* BOTÕES DE AÇÃO NA CAIXA */
         .action-btns { position: absolute; top: -15px; right: -15px; display: none; gap: 8px; z-index: 100; }
         .action-btn { width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 1rem; cursor: pointer; border: 2px solid #fff; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.8);}
         .delete-btn { background: #e63946; color: white; }
@@ -307,14 +296,18 @@
         .edit-btn { background: var(--gold); color: #000; }
         .edit-btn:hover { transform: scale(1.2); }
 
-        /* RESPONSIVIDADE */
+        .footer-credits { text-align: center; padding: 30px; color: #444; font-size: 0.75rem; font-family: 'Montserrat', sans-serif; letter-spacing: 2px; margin-top: auto; }
+
         @media (max-width: 900px) {
-            .modal-content, .mural-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
-            .modal-image-container, .mural-draw-area { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; }
+            .modal-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
+            .modal-image-container { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; }
             .modal-dvd-case { width: 200px; height: 280px; }
-            .modal-info, .mural-gallery { width: 100%; padding: 30px 20px; overflow-y: visible;}
+            .modal-info { width: 100%; padding: 30px 20px; overflow-y: visible;}
             .wax-seal { top: 15px; right: 15px; width: 100px; height: 100px; font-size: 0.9rem; }
             .shelf-row { height: auto; padding-top: 20px; }
+            .mural-header { flex-direction: column; text-align: center; }
+            .mural-header-info { text-align: center; }
+            .mural-actions { flex-direction: row; }
         }
         @media (max-width: 600px) {
             .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; margin-bottom: 15px; }
@@ -336,20 +329,24 @@
     <p class="subtitle">A partir de 2025</p>
     
     <div class="controls-bar">
-        <button id="btn-led" class="btn-led" onclick="toggleLED()">💡 LEDs: ON</button>
-        <button class="btn-mural" onclick="openMural()">✍️ Mural de Assinaturas</button>
+        <button id="btn-led" class="btn-action" onclick="toggleLED()">💡 LEDs: ON</button>
+        <button class="btn-action" onclick="openMural()">✍️ Mural de Assinaturas</button>
         
         <label for="sort-select" style="margin-left: 10px;">Organizar estante:</label>
         <select id="sort-select" onchange="handleSort()">
-            <option value="recent">Mais Recentes Adicionados</option>
+            <option value="recent">Mais Recentes</option>
             <option value="score">Maior Nota</option>
             <option value="az">A - Z</option>
         </select>
     </div>
 </header>
 
-<div id="loading-msg">Conectando ao Banco de Dados...</div>
+<div id="app-status">Conectando ao Banco de Dados...</div>
 <div class="library-container" id="library"></div>
+
+<footer class="footer-credits">
+    CRIADO E PROGRAMADO POR NOOD32
+</footer>
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
@@ -364,21 +361,21 @@
         </div>
         
         <div class="modal-info" id="m-info-scroll">
-            <div class="modal-title-display anim-text delay-1" id="m-title-display">Título</div>
+            <div class="modal-title-display anim-text delay-1" id="m-title-display"></div>
             <div class="anim-text delay-2">
-                <div class="modal-platform" id="m-platform">Plataforma</div>
+                <div class="modal-platform" id="m-platform"></div>
                 <div style="clear: both;"></div>
                 <div class="modal-score-title">Avaliação Final</div>
                 <div class="modal-score-wrapper">
                     <div class="modal-score-value"><span id="m-score"></span>/10</div>
                 </div>
             </div>
-            <p class="modal-date anim-text delay-3">Data do Zeramento: <span style="color: var(--gold);" id="m-date"></span></p>
-            <p class="modal-desc anim-text delay-4">"<span id="m-desc"></span>"</p>
+            <p class="modal-date anim-text delay-3">Data: <span style="color: var(--gold);" id="m-date"></span></p>
+            <p class="modal-desc anim-text delay-4" id="m-desc"></p>
 
-            <div class="print-thumbnail-container anim-text delay-5" id="m-print-container">
-                <p>📸 Print Guardado</p>
-                <img id="m-print-thumb" class="print-thumbnail" src="" alt="Miniatura do Print" onclick="openLightbox()">
+            <div class="print-wrapper anim-text delay-5" id="m-print-wrapper">
+                <h3>📸 Galeria de Prints</h3>
+                <div class="prints-gallery" id="m-prints-gallery"></div>
             </div>
         </div>
     </div>
@@ -387,7 +384,7 @@
 <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
     <div class="lightbox-content">
         <button class="lightbox-close" onclick="closeLightbox(event)">✖</button>
-        <img id="lightbox-img" src="" alt="Print Expandido">
+        <img id="lightbox-img" src="" alt="Print">
     </div>
 </div>
 
@@ -395,21 +392,20 @@
     <div class="mural-content">
         <button class="close-btn" onclick="closeMural()">✖</button>
         
-        <div class="mural-draw-area">
-            <h2>Deixe sua Marca</h2>
-            <p>Faça uma assinatura rápida com o mouse abaixo e salve no banco de dados.</p>
-            <canvas id="signature-pad" width="350" height="200"></canvas>
+        <div class="mural-header">
+            <div class="mural-header-info">
+                <h2>Mural da Comunidade</h2>
+                <p>Deixe sua marca no site. Desenhe sua assinatura.</p>
+            </div>
+            <canvas id="signature-pad" width="300" height="150"></canvas>
             <div class="mural-actions">
+                <button class="admin-btn" id="btn-save-sig" onclick="saveSignature()">Salvar Marca</button>
                 <button class="admin-btn danger" onclick="clearCanvas()">Limpar</button>
-                <button class="admin-btn" id="btn-save-sig" onclick="saveSignature()">Salvar no Mural</button>
             </div>
         </div>
 
-        <div class="mural-gallery">
-            <h2>Assinaturas Anteriores</h2>
-            <div class="signatures-grid" id="sig-grid">
-                <p style="color: #666; text-align: center;">Carregando mural...</p>
-            </div>
+        <div class="mural-gallery" id="sig-grid">
+            <p style="color: #666; width: 100%; text-align: center; margin-top: 50px;">Carregando painel...</p>
         </div>
     </div>
 </div>
@@ -424,7 +420,7 @@
         </div>
 
         <button class="admin-btn" onclick="toggleAddForm()">+ Novo Jogo</button>
-        <button class="admin-btn danger" onclick="toggleDeleteMode()" id="del-mode-btn">Habilitar Edição/Exclusão</button>
+        <button class="admin-btn danger" onclick="toggleDeleteMode()" id="del-mode-btn">Habilitar Edição</button>
         <button class="admin-btn" onclick="logoutAdmin()" style="background: #333; color: #fff;">Sair</button>
     </div>
     <div id="add-form">
@@ -439,22 +435,17 @@
         </select>
         <input type="number" id="i-score" placeholder="Nota (ex: 9.5)" step="0.1" required>
         <input type="text" id="i-date" placeholder="Data (DD/MM/AAAA)" required>
-        <input type="text" id="i-print" placeholder="Print (ex: ./prints/jogo.jpg)">
-        <input type="text" id="i-desc" placeholder="Review/Comentário Curto" style="width: 300px;" required>
+        <input type="text" id="i-print" placeholder="Links dos Prints (separados por vírgula)" style="width: 300px;">
+        <input type="text" id="i-desc" placeholder="Review / Comentário Curto" style="width: 300px;" required>
         
         <button class="admin-btn" id="btn-save-game" onclick="saveNewGame()">Salvar Jogo na Nuvem</button>
     </div>
 </div>
 
 <script>
-    // ==========================================
-    // CHAVES DO SUPABASE
-    // ==========================================
     const SUPABASE_URL = 'https://hqtctbvrtipperfbkxfd.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_9KqLVuA2pGACwtOlbmw9ug_ATvduPkE';
-
-    // Cria o cliente Supabase de forma segura (sem conflito de nomes)
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let games = [];
     let displayGames = []; 
@@ -462,42 +453,31 @@
     let deleteMode = false;
     let editTargetId = null; 
     
-    // Tratamento à prova de falhas para o LocalStorage
     let ledState = { isOn: true, color: '#00e5ff' };
     try {
         const savedLed = localStorage.getItem('nerisLedState');
         if (savedLed) ledState = JSON.parse(savedLed);
-    } catch(e) {
-        console.log("Memória do LED resetada.");
-    }
+    } catch(e) {}
 
-    // CARREGA OS JOGOS DO BANCO
-    async function loadGames() {
+    async function initApp() {
         try {
-            let { data, error } = await supabaseClient.from('games').select('*').order('created_at', { ascending: false });
-            
+            let { data, error } = await db.from('games').select('*').order('created_at', { ascending: false });
             if (error) throw error;
-            
             games = data || [];
             displayGames = [...games];
-            document.getElementById('loading-msg').style.display = 'none';
+            document.getElementById('app-status').style.display = 'none';
             document.getElementById('library').style.display = 'flex';
             renderLibrary();
-
         } catch (err) {
-            console.error("Erro Supabase:", err);
-            // Se der erro, mostra mensagem, mas EXIBE a biblioteca vazia para você conseguir abrir o Modo Deus
-            document.getElementById('loading-msg').innerText = "⚠️ Erro no Banco de Dados! Você rodou o código SQL no Supabase?";
+            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor. Configure as chaves Supabase corretamente.";
             document.getElementById('library').style.display = 'flex';
         }
     }
 
-    // APLICAÇÃO DO LED
     function applyLEDState() {
         document.documentElement.style.setProperty('--led-color', ledState.color);
         const btn = document.getElementById('btn-led');
         const rows = document.querySelectorAll('.shelf-row');
-        
         if (ledState.isOn) {
             btn.classList.add('active'); btn.innerHTML = '💡 LEDs: ON';
             rows.forEach(row => row.classList.add('led-active'));
@@ -529,12 +509,11 @@
         renderLibrary();
     }
 
-    function getItemsPerShelf() {
-        const width = window.innerWidth;
-        if (width > 1300) return 6;
-        if (width > 1050) return 5;
-        if (width > 850) return 4;
-        if (width > 600) return 3;
+    function calculateShelfCapacity() {
+        const w = window.innerWidth;
+        if (w > 1300) return 6;
+        if (w > 1050) return 5;
+        if (w > 850) return 4;
         return 3; 
     }
 
@@ -542,33 +521,27 @@
         const library = document.getElementById('library');
         library.innerHTML = ''; 
         let shelfRow, shelfContent;
-        const itemsPerShelf = getItemsPerShelf();
+        const capacity = calculateShelfCapacity();
 
         displayGames.forEach((game, index) => {
-            if (index % itemsPerShelf === 0) {
+            if (index % capacity === 0) {
                 shelfRow = document.createElement('div'); shelfRow.className = 'shelf-row';
                 shelfContent = document.createElement('div'); shelfContent.className = 'shelf-content';
                 shelfRow.appendChild(shelfContent); library.appendChild(shelfRow);
             }
 
             const wrapper = document.createElement('div'); wrapper.className = 'game-case-wrapper';
-            
             if (parseFloat(game.score) === 10) wrapper.classList.add('masterpiece');
 
             const shadow = document.createElement('div'); shadow.className = 'case-shadow'; wrapper.appendChild(shadow);
-            const platformBadge = document.createElement('div'); platformBadge.className = 'platform-badge';
-            platformBadge.innerText = game.platform || "PC";
-            wrapper.appendChild(platformBadge);
+            const badge = document.createElement('div'); badge.className = 'platform-badge'; badge.innerText = game.platform || "PC";
+            wrapper.appendChild(badge);
 
-            // Container de Edição e Exclusão
             const actionBtns = document.createElement('div'); actionBtns.className = 'action-btns';
-            
             const editBtn = document.createElement('button'); editBtn.className = 'action-btn edit-btn'; editBtn.innerHTML = '✏️';
             editBtn.onclick = (e) => { e.stopPropagation(); startEditGame(game); };
-            
             const delBtn = document.createElement('button'); delBtn.className = 'action-btn delete-btn'; delBtn.innerText = 'X';
             delBtn.onclick = (e) => { e.stopPropagation(); deleteGame(game.id); };
-
             actionBtns.appendChild(editBtn); actionBtns.appendChild(delBtn);
             if(isAdmin && deleteMode) actionBtns.style.display = 'flex';
 
@@ -593,8 +566,7 @@
                 }
             }
 
-            gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top); 
-            gameCase.appendChild(reflection); 
+            gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top); gameCase.appendChild(reflection); 
             animator.appendChild(gameCase); wrapper.appendChild(animator); wrapper.appendChild(actionBtns); shelfContent.appendChild(wrapper);
         });
         
@@ -611,15 +583,27 @@
         document.getElementById('m-platform').innerText = game.platform || "PC";
         document.getElementById('m-score').innerText = game.score;
         document.getElementById('m-date').innerText = game.date;
-        document.getElementById('m-desc').innerText = game.review || 'Sem comentários.';
+        document.getElementById('m-desc').innerText = game.review ? `"${game.review}"` : '';
 
-        // LÓGICA DO PRINT
-        const printContainer = document.getElementById('m-print-container');
-        const printThumb = document.getElementById('m-print-thumb');
+        const printWrapper = document.getElementById('m-print-wrapper');
+        const printGallery = document.getElementById('m-prints-gallery');
+        printGallery.innerHTML = '';
+
         if (game.print && game.print.trim() !== "") {
-            printThumb.src = game.print; printContainer.style.display = 'block';
+            const links = game.print.split(',').map(l => l.trim()).filter(l => l);
+            if (links.length > 0) {
+                links.forEach(link => {
+                    const img = document.createElement('img');
+                    img.className = 'print-thumbnail'; img.src = link;
+                    img.onclick = () => openLightbox(link);
+                    printGallery.appendChild(img);
+                });
+                printWrapper.style.display = 'block';
+            } else {
+                printWrapper.style.display = 'none';
+            }
         } else {
-            printContainer.style.display = 'none'; printThumb.src = "";
+            printWrapper.style.display = 'none';
         }
 
         const seal = document.getElementById('m-seal');
@@ -632,56 +616,42 @@
     function closeModal() { modal.classList.remove('active'); }
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-    // LIGHTBOX
-    function openLightbox() {
-        const thumbSrc = document.getElementById('m-print-thumb').src;
-        if(thumbSrc) { document.getElementById('lightbox-img').src = thumbSrc; document.getElementById('lightbox').classList.add('active'); }
+    function openLightbox(src) {
+        if(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').classList.add('active'); }
     }
     function closeLightbox(event) {
         if(event.target.id === 'lightbox' || event.target.className === 'lightbox-close') { document.getElementById('lightbox').classList.remove('active'); }
     }
 
-    // ADMIN (SUPABASE)
-    let clicks = 0;
-    // Os Event Listeners ficam no topo para sempre funcionarem
+    let adminClicks = 0;
     document.getElementById('main-title').addEventListener('click', () => {
-        clicks++;
-        if(clicks === 3) {
-            clicks = 0; const password = prompt("Modo Deus. Senha:");
-            if(password === "nerisadmin") { isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; renderLibrary(); }
+        adminClicks++;
+        if(adminClicks === 3) {
+            adminClicks = 0; const pwd = prompt("Acesso Restrito:");
+            if(pwd === "nerisadmin") { isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; renderLibrary(); }
         }
-        setTimeout(() => clicks = 0, 2000);
+        setTimeout(() => adminClicks = 0, 2000);
     });
 
     function toggleAddForm() {
         const form = document.getElementById('add-form'); 
         form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
         if(form.style.display === 'flex') {
-            document.getElementById('btn-save-game').innerText = "Salvar na Nuvem";
-            editTargetId = null; // Reseta ID
+            document.getElementById('btn-save-game').innerText = "Salvar na Nuvem"; editTargetId = null;
             document.getElementById('i-title').value = ''; document.getElementById('i-cover').value = ''; document.getElementById('i-score').value = ''; document.getElementById('i-date').value = ''; document.getElementById('i-desc').value = ''; document.getElementById('i-print').value = '';
         }
     }
     function toggleDeleteMode() {
-        deleteMode = !deleteMode;
-        const btn = document.getElementById('del-mode-btn');
-        btn.innerText = deleteMode ? "Cancelar Edição" : "Habilitar Edição/Exclusão";
+        deleteMode = !deleteMode; const btn = document.getElementById('del-mode-btn');
+        btn.innerText = deleteMode ? "Concluir Edição" : "Habilitar Edição";
         btn.style.background = deleteMode ? "#e63946" : "var(--gold)"; btn.style.color = deleteMode ? "#fff" : "#000";
         renderLibrary();
     }
 
     function startEditGame(game) {
         editTargetId = game.id; 
-        document.getElementById('i-title').value = game.title; 
-        document.getElementById('i-cover').value = game.cover;
-        document.getElementById('i-platform').value = game.platform;
-        document.getElementById('i-score').value = game.score; 
-        document.getElementById('i-date').value = game.date;
-        document.getElementById('i-desc').value = game.review || '';
-        document.getElementById('i-print').value = game.print || '';
-
-        document.getElementById('add-form').style.display = 'flex';
-        document.getElementById('btn-save-game').innerText = "💾 Atualizar Jogo";
+        document.getElementById('i-title').value = game.title; document.getElementById('i-cover').value = game.cover; document.getElementById('i-platform').value = game.platform; document.getElementById('i-score').value = game.score; document.getElementById('i-date').value = game.date; document.getElementById('i-desc').value = game.review || ''; document.getElementById('i-print').value = game.print || '';
+        document.getElementById('add-form').style.display = 'flex'; document.getElementById('btn-save-game').innerText = "💾 Atualizar Banco";
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
@@ -691,84 +661,59 @@
         const date = document.getElementById('i-date').value; const review = document.getElementById('i-desc').value;
         const print = document.getElementById('i-print').value;
 
-        if(!title || !cover) return alert("Preencha título e capa!");
+        if(!title || !cover) return;
 
         const btn = document.getElementById('btn-save-game');
-        btn.innerText = "Processando Nuvem..."; btn.disabled = true;
+        btn.innerText = "Processando..."; btn.disabled = true;
 
         try {
             if (editTargetId) {
-                // ATUALIZAR
-                const { error } = await supabaseClient.from('games').update({ title, cover, platform, score, date, review, print }).eq('id', editTargetId);
+                const { error } = await db.from('games').update({ title, cover, platform, score, date, review, print }).eq('id', editTargetId);
                 if(error) throw error;
             } else {
-                // NOVO
-                const { error } = await supabaseClient.from('games').insert([{ title, cover, platform, score, date, review, print }]);
+                const { error } = await db.from('games').insert([{ title, cover, platform, score, date, review, print }]);
                 if(error) throw error;
             }
-            document.getElementById('add-form').style.display = 'none';
-            editTargetId = null;
-            await loadGames(); 
-        } catch (err) {
-            alert("Erro ao salvar! Veja o console (F12).");
-            console.error(err);
-        }
+            document.getElementById('add-form').style.display = 'none'; editTargetId = null;
+            await initApp(); 
+        } catch (err) { alert("Erro de transação."); }
         btn.innerText = "Salvar na Nuvem"; btn.disabled = false;
     }
 
     async function deleteGame(id) {
-        if(confirm("Excluir pra sempre do banco de dados?")) {
-            try {
-                await supabaseClient.from('games').delete().eq('id', id);
-                await loadGames();
-            } catch(e) {
-                alert("Erro ao excluir.");
-            }
+        if(confirm("Confirmar exclusão permanente?")) {
+            try { await db.from('games').delete().eq('id', id); await initApp(); } catch(e) { alert("Erro na exclusão."); }
         }
     }
 
     function logoutAdmin() { isAdmin = false; deleteMode = false; document.getElementById('admin-panel').style.display = 'none'; renderLibrary(); }
 
-    // === MURAL DE ASSINATURAS (CANVAS) ===
     const canvas = document.getElementById('signature-pad');
     const ctx = canvas.getContext('2d');
     let isDrawing = false;
 
-    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.shadowBlur = 5; ctx.shadowColor = '#d4af37';
+    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.shadowBlur = 4; ctx.shadowColor = '#d4af37';
 
-    canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
-    canvas.addEventListener('mousemove', (e) => { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); }});
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mouseout', () => isDrawing = false);
+    const getPos = (e) => { const rect = canvas.getBoundingClientRect(); return { x: (e.clientX || e.touches[0].clientX) - rect.left, y: (e.clientY || e.touches[0].clientY) - rect.top }; };
+    
+    const startDraw = (e) => { isDrawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); };
+    const drawing = (e) => { if (isDrawing) { e.preventDefault(); const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }};
+    const endDraw = () => isDrawing = false;
 
-    // Suporte para Touch
-    canvas.addEventListener('touchstart', (e) => { 
-        isDrawing = true; const touch = e.touches[0]; const rect = canvas.getBoundingClientRect();
-        ctx.beginPath(); ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    });
-    canvas.addEventListener('touchmove', (e) => { 
-        if (isDrawing) { e.preventDefault(); const touch = e.touches[0]; const rect = canvas.getBoundingClientRect();
-        ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top); ctx.stroke(); }
-    });
-    canvas.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', drawing); canvas.addEventListener('mouseup', endDraw); canvas.addEventListener('mouseout', endDraw);
+    canvas.addEventListener('touchstart', startDraw, {passive: false}); canvas.addEventListener('touchmove', drawing, {passive: false}); canvas.addEventListener('touchend', endDraw);
 
     function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-    function openMural() {
-        document.getElementById('mural-modal').classList.add('active');
-        loadSignatures();
-    }
+    function openMural() { document.getElementById('mural-modal').classList.add('active'); loadSignatures(); }
     function closeMural() { document.getElementById('mural-modal').classList.remove('active'); clearCanvas(); }
 
     async function loadSignatures() {
         const grid = document.getElementById('sig-grid');
-        grid.innerHTML = '<p style="color: #666; text-align: center;">Carregando...</p>';
-        
+        grid.innerHTML = '<p style="color: #666; width: 100%; text-align: center; margin-top: 50px;">Acessando servidor...</p>';
         try {
-            let { data, error } = await supabaseClient.from('signatures').select('*').order('created_at', { ascending: false }).limit(20);
+            let { data, error } = await db.from('signatures').select('*').order('created_at', { ascending: false }).limit(40);
             if(error) throw error;
-            
             grid.innerHTML = '';
             if(data && data.length > 0) {
                 data.forEach(sig => {
@@ -777,35 +722,29 @@
                     div.appendChild(img); grid.appendChild(div);
                 });
             } else {
-                grid.innerHTML = '<p style="color: #666; text-align: center;">Nenhuma assinatura ainda. Seja o primeiro!</p>';
+                grid.innerHTML = '<p style="color: #666; width: 100%; text-align: center; margin-top: 50px;">Mural vazio.</p>';
             }
-        } catch(e) {
-            grid.innerHTML = '<p style="color: #e63946; text-align: center;">Erro ao carregar assinaturas.</p>';
-        }
+        } catch(e) { grid.innerHTML = '<p style="color: #e63946; width: 100%; text-align: center; margin-top: 50px;">Falha ao carregar mural.</p>'; }
     }
 
     async function saveSignature() {
         const btn = document.getElementById('btn-save-sig');
         const blank = document.createElement('canvas'); blank.width = canvas.width; blank.height = canvas.height;
-        if(canvas.toDataURL() === blank.toDataURL()) return alert("Desenhe algo antes de salvar!");
+        if(canvas.toDataURL() === blank.toDataURL()) return;
 
-        btn.innerText = "Salvando..."; btn.disabled = true;
+        btn.innerText = "Enviando..."; btn.disabled = true;
         const imageData = canvas.toDataURL('image/png');
 
         try {
-            const { error } = await supabaseClient.from('signatures').insert([{ image_data: imageData }]);
+            const { error } = await db.from('signatures').insert([{ image_data: imageData }]);
             if(error) throw error;
             clearCanvas(); loadSignatures();
-        } catch(err) {
-            alert("Erro ao salvar assinatura.");
-        }
-        btn.innerText = "Salvar no Mural"; btn.disabled = false;
+        } catch(err) { alert("Falha na gravação."); }
+        btn.innerText = "Salvar Marca"; btn.disabled = false;
     }
 
     window.addEventListener('resize', renderLibrary); 
-    
-    // START
-    loadGames();
+    initApp();
 </script>
 
 </body>
