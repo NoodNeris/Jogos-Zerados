@@ -24,13 +24,31 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* === FUNDO MODERNO ANIMADO === */
         body {
-            background-color: #030303;
-            background-image: radial-gradient(circle at 50% 0%, #1a100a, #030303 100%);
+            background-color: #050505;
             font-family: 'Montserrat', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
             color: #fff;
+            position: relative;
+        }
+
+        .bg-particles {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none;
+            background: radial-gradient(circle at 50% 0%, #1a100a 0%, #030303 80%);
+            overflow: hidden;
+        }
+        .bg-particles::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 200vw; height: 200vh;
+            background-image: radial-gradient(var(--gold) 1px, transparent 1px);
+            background-size: 80px 80px; opacity: 0.05;
+            animation: floatBG 90s linear infinite;
+        }
+        @keyframes floatBG {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-50vh) translateX(-50vw); }
         }
 
         /* CABEÇALHO */
@@ -85,7 +103,7 @@
             border-right: clamp(10px, 3vw, 35px) solid #140a05; 
             border-top: clamp(10px, 3vw, 35px) solid #140a05;
             box-shadow: 0 50px 100px rgba(0,0,0,1), inset 0 0 60px rgba(0,0,0,0.9);
-            background: var(--wood-dark); border-radius: 8px; display: none; /* Escondido até carregar o BD */
+            background: var(--wood-dark); border-radius: 8px; display: none;
         }
 
         .shelf-row {
@@ -93,7 +111,7 @@
             display: flex; justify-content: center; align-items: flex-end;
             padding-bottom: 25px; border-bottom: 45px solid #1c1109;
             box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8);
-            background: linear-gradient(to bottom, #050302, var(--wood-back));
+            background: linear-gradient(to bottom, transparent, var(--wood-back));
             perspective: 1400px; z-index: 1; transition: box-shadow 0.4s;
         }
 
@@ -177,6 +195,13 @@
         .masterpiece:hover .case-shadow { background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.9) 0%, transparent 70%); }
         .masterpiece .platform-badge { background: linear-gradient(135deg, #1a1400, #403000); border: 1px solid var(--gold); color: var(--gold); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.6); }
         .masterpiece .platform-badge::before { content: '👑 '; }
+        
+        .sparkle {
+            position: absolute; bottom: 0; width: 4px; height: 4px; background: var(--gold); border-radius: 50%;
+            box-shadow: 0 0 10px var(--gold); opacity: 0; pointer-events: none;
+            animation: floatUp 3s infinite linear;
+        }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-150px) scale(0); opacity: 0; } }
 
         /* === MODAL E DVD GIGANTE === */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000; }
@@ -273,8 +298,14 @@
         .led-picker input { cursor: pointer; border: none; background: transparent; width: 30px; height: 30px; padding: 0; }
         #add-form { display: none; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
         #add-form input, #add-form select { padding: 10px; background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: 'Montserrat'; }
-        .delete-btn { position: absolute; top: -15px; right: -15px; background: #e63946; color: white; border: 2px solid #fff; border-radius: 50%; width: 35px; height: 35px; font-weight: bold; font-size: 1.2rem; cursor: pointer; display: none; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.8); transition: 0.2s; }
+        
+        /* BOTÕES DE AÇÃO NA CAIXA */
+        .action-btns { position: absolute; top: -15px; right: -15px; display: none; gap: 8px; z-index: 100; }
+        .action-btn { width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 1rem; cursor: pointer; border: 2px solid #fff; display: flex; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.8);}
+        .delete-btn { background: #e63946; color: white; }
         .delete-btn:hover { transform: scale(1.2); }
+        .edit-btn { background: var(--gold); color: #000; }
+        .edit-btn:hover { transform: scale(1.2); }
 
         /* RESPONSIVIDADE */
         @media (max-width: 900px) {
@@ -393,7 +424,7 @@
         </div>
 
         <button class="admin-btn" onclick="toggleAddForm()">+ Novo Jogo</button>
-        <button class="admin-btn danger" onclick="toggleDeleteMode()" id="del-mode-btn">Habilitar Exclusão</button>
+        <button class="admin-btn danger" onclick="toggleDeleteMode()" id="del-mode-btn">Habilitar Edição/Exclusão</button>
         <button class="admin-btn" onclick="logoutAdmin()" style="background: #333; color: #fff;">Sair</button>
     </div>
     <div id="add-form">
@@ -408,25 +439,28 @@
         </select>
         <input type="number" id="i-score" placeholder="Nota (ex: 9.5)" step="0.1" required>
         <input type="text" id="i-date" placeholder="Data (DD/MM/AAAA)" required>
-        <input type="text" id="i-print" placeholder="Link do Print (Opcional)">
+        <input type="text" id="i-print" placeholder="Print (ex: ./prints/jogo.jpg)">
         <input type="text" id="i-desc" placeholder="Review/Comentário Curto" style="width: 300px;" required>
+        
         <button class="admin-btn" id="btn-save-game" onclick="saveNewGame()">Salvar Jogo na Nuvem</button>
     </div>
 </div>
 
 <script>
     // ==========================================
-    // ⚠️ COLOQUE SUAS CHAVES DO SUPABASE AQUI ⚠️
+    // CHAVES DO SUPABASE (CONFIGURADAS)
     // ==========================================
-    const SUPABASE_URL = 'SUA_URL_AQUI_ENTRE_AS_ASPAS';
-    const SUPABASE_ANON_KEY = 'SUA_CHAVE_AQUI_ENTRE_AS_ASPAS';
+    const SUPABASE_URL = 'https://hqtctbvrtipperfbkxfd.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_9KqLVuA2pGACwtOlbmw9ug_ATvduPkE';
 
     // Cria o cliente Supabase
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let games = [];
     let displayGames = []; 
-    let isAdmin = false; let deleteMode = false;
+    let isAdmin = false; 
+    let deleteMode = false;
+    let editTargetId = null; // Agora usamos o ID do banco para editar
     let ledState = JSON.parse(localStorage.getItem('nerisLedState')) || { isOn: true, color: '#00e5ff' };
 
     // CARREGA OS JOGOS DO BANCO
@@ -508,9 +542,17 @@
             platformBadge.innerText = game.platform || "PC";
             wrapper.appendChild(platformBadge);
 
-            const delBtn = document.createElement('button'); delBtn.className = 'delete-btn'; delBtn.innerText = 'X';
-            delBtn.onclick = (e) => { e.stopPropagation(); deleteGame(game.id); }; // Agora deleta pelo ID do banco
-            if(isAdmin && deleteMode) delBtn.style.display = 'block';
+            // Container de Edição e Exclusão
+            const actionBtns = document.createElement('div'); actionBtns.className = 'action-btns';
+            
+            const editBtn = document.createElement('button'); editBtn.className = 'action-btn edit-btn'; editBtn.innerHTML = '✏️';
+            editBtn.onclick = (e) => { e.stopPropagation(); startEditGame(game); };
+            
+            const delBtn = document.createElement('button'); delBtn.className = 'action-btn delete-btn'; delBtn.innerText = 'X';
+            delBtn.onclick = (e) => { e.stopPropagation(); deleteGame(game.id); };
+
+            actionBtns.appendChild(editBtn); actionBtns.appendChild(delBtn);
+            if(isAdmin && deleteMode) actionBtns.style.display = 'flex';
 
             wrapper.onclick = () => { if(!deleteMode) openModal(game); };
 
@@ -535,7 +577,7 @@
 
             gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top); 
             gameCase.appendChild(reflection); 
-            animator.appendChild(gameCase); wrapper.appendChild(animator); wrapper.appendChild(delBtn); shelfContent.appendChild(wrapper);
+            animator.appendChild(gameCase); wrapper.appendChild(animator); wrapper.appendChild(actionBtns); shelfContent.appendChild(wrapper);
         });
         
         applyLEDState();
@@ -596,16 +638,32 @@
         const form = document.getElementById('add-form'); 
         form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
         if(form.style.display === 'flex') {
-            document.getElementById('btn-save-game').innerText = "Salvar Novo Jogo";
+            document.getElementById('btn-save-game').innerText = "Salvar na Nuvem";
+            editTargetId = null; // Reseta ID
             document.getElementById('i-title').value = ''; document.getElementById('i-cover').value = ''; document.getElementById('i-score').value = ''; document.getElementById('i-date').value = ''; document.getElementById('i-desc').value = ''; document.getElementById('i-print').value = '';
         }
     }
     function toggleDeleteMode() {
         deleteMode = !deleteMode;
         const btn = document.getElementById('del-mode-btn');
-        btn.innerText = deleteMode ? "Cancelar Exclusão" : "Habilitar Exclusão";
+        btn.innerText = deleteMode ? "Cancelar Edição" : "Habilitar Edição/Exclusão";
         btn.style.background = deleteMode ? "#e63946" : "var(--gold)"; btn.style.color = deleteMode ? "#fff" : "#000";
         renderLibrary();
+    }
+
+    function startEditGame(game) {
+        editTargetId = game.id; // Guarda o ID do Supabase
+        document.getElementById('i-title').value = game.title; 
+        document.getElementById('i-cover').value = game.cover;
+        document.getElementById('i-platform').value = game.platform;
+        document.getElementById('i-score').value = game.score; 
+        document.getElementById('i-date').value = game.date;
+        document.getElementById('i-desc').value = game.review || '';
+        document.getElementById('i-print').value = game.print || '';
+
+        document.getElementById('add-form').style.display = 'flex';
+        document.getElementById('btn-save-game').innerText = "💾 Atualizar Jogo";
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
     async function saveNewGame() {
@@ -617,17 +675,22 @@
         if(!title || !cover) return alert("Preencha título e capa!");
 
         const btn = document.getElementById('btn-save-game');
-        btn.innerText = "Salvando na Nuvem..."; btn.disabled = true;
+        btn.innerText = "Processando Nuvem..."; btn.disabled = true;
 
-        const { data, error } = await supabase.from('games').insert([{ title, cover, platform, score, date, review, print }]);
-
-        if(error) {
-            alert("Erro ao salvar no banco!"); console.error(error);
+        if (editTargetId) {
+            // ATUALIZAR JOGO
+            const { error } = await supabase.from('games').update({ title, cover, platform, score, date, review, print }).eq('id', editTargetId);
+            if(error) { alert("Erro ao atualizar!"); console.error(error); }
         } else {
-            document.getElementById('add-form').style.display = 'none';
-            await loadGames(); // Recarrega da nuvem
+            // NOVO JOGO
+            const { error } = await supabase.from('games').insert([{ title, cover, platform, score, date, review, print }]);
+            if(error) { alert("Erro ao salvar!"); console.error(error); }
         }
-        btn.innerText = "Salvar Jogo"; btn.disabled = false;
+
+        document.getElementById('add-form').style.display = 'none';
+        editTargetId = null;
+        await loadGames(); // Recarrega da nuvem
+        btn.innerText = "Salvar na Nuvem"; btn.disabled = false;
     }
 
     async function deleteGame(id) {
@@ -644,7 +707,6 @@
     const ctx = canvas.getContext('2d');
     let isDrawing = false;
 
-    // Configura pincel dourado neon
     ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     ctx.shadowBlur = 5; ctx.shadowColor = '#d4af37';
 
@@ -693,7 +755,6 @@
     async function saveSignature() {
         const btn = document.getElementById('btn-save-sig');
         
-        // Verifica se o canvas está vazio verificando pixels
         const blank = document.createElement('canvas'); blank.width = canvas.width; blank.height = canvas.height;
         if(canvas.toDataURL() === blank.toDataURL()) return alert("Desenhe algo antes de salvar!");
 
