@@ -11,6 +11,7 @@
 
     <style>
         :root {
+            /* Fundo da estante mais transparente para ver o vídeo através da madeira */
             --wood-dark: rgba(10, 7, 5, 0.4); 
             --wood-back: rgba(20, 13, 9, 0.6);
             --wood-floor: rgba(51, 32, 20, 0.8);
@@ -40,7 +41,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -3; 
+            z-index: -3; /* Fica atrás de absolutamente tudo */
         }
         .video-container video {
             width: 100%;
@@ -75,15 +76,16 @@
         /* === CABEÇALHO IMERSIVO ESTILO STEAM === */
         .hero-section {
             width: 100%;
-            height: 65vh; 
+            height: 65vh; /* Ocupa 65% da tela inicial */
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; 
-            align-items: flex-start; 
-            padding: 50px 8vw; 
+            justify-content: flex-end; /* Empurra o texto para baixo */
+            align-items: flex-start; /* Alinha o texto na esquerda */
+            padding: 50px 8vw; /* Espaçamento das bordas */
             z-index: 10;
         }
 
+        /* O TÍTULO (Livre, sem caixa, com contorno preto) */
         .hero-title {
             font-family: 'Cinzel', serif; 
             font-size: clamp(3rem, 7vw, 6.5rem); 
@@ -93,6 +95,7 @@
             letter-spacing: 4px;
             margin-bottom: 0;
             line-height: 1.1;
+            /* CONTORNO PRETO ESTILO LOGO DE JOGO */
             -webkit-text-stroke: 2px #000; 
             text-shadow: 0px 15px 30px rgba(0,0,0,0.9);
             transition: transform 0.3s ease;
@@ -109,6 +112,7 @@
             letter-spacing: 4px; 
             font-weight: bold;
             margin-top: 5px;
+            /* Contorno fino no subtítulo */
             -webkit-text-stroke: 1px #000;
             text-shadow: 0 5px 15px rgba(0,0,0,0.9);
         }
@@ -119,7 +123,7 @@
             max-width: 1500px;
             margin: 0 auto 40px auto;
             background: rgba(10, 10, 10, 0.7);
-            backdrop-filter: blur(10px); 
+            backdrop-filter: blur(10px); /* Vidro fosco elegante */
             padding: 15px 30px; 
             display: flex; justify-content: center; gap: 20px; align-items: center;
             border-radius: 12px; 
@@ -144,28 +148,6 @@
         }
         .btn-action:hover { background: rgba(30,30,30,0.9); border-color: var(--gold); }
 
-        /* === ÁREA JOGANDO ATUALMENTE === */
-        .playing-highlight {
-            width: 100%; max-width: 1500px; margin: 0 auto 40px auto;
-            background: rgba(20, 15, 10, 0.7);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(212,175,55,0.1);
-            position: relative;
-            z-index: 10;
-            display: none; /* Só aparece se tiver jogo */
-        }
-        .playing-header {
-            font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.8rem;
-            text-align: center; margin-bottom: 25px; text-shadow: 0 4px 10px rgba(0,0,0,0.8);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 15px;
-        }
-        .playing-shelf {
-            display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; perspective: 1200px;
-        }
-
         #app-status { text-align: center; color: var(--gold); font-family: 'Cinzel'; font-size: 1.2rem; margin-bottom: 30px; text-shadow: 0 0 10px #000; padding: 0 20px; position: relative; z-index: 10;}
 
         /* A ESTANTE VOLUMÉTRICA */
@@ -177,6 +159,7 @@
             border-top: clamp(10px, 3vw, 35px) solid rgba(15,10,5,0.8);
             box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8);
             background: var(--wood-dark); 
+            backdrop-filter: blur(8px); /* Deixa o vídeo visível, mas desfocado, atrás da estante */
             border-radius: 8px; display: none;
             z-index: 10;
             position: relative;
@@ -185,7 +168,7 @@
         .shelf-row {
             position: relative; width: 100%; min-height: 400px;
             display: flex; justify-content: center; align-items: flex-end;
-            padding-bottom: 25px; border-bottom: 45px solid rgba(28, 17, 9, 0.95);
+            padding-bottom: 25px; border-bottom: 45px solid rgba(28, 17, 9, 0.85);
             box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8);
             background: linear-gradient(to bottom, transparent, var(--wood-back));
             perspective: 1400px; z-index: 1; transition: box-shadow 0.4s;
@@ -269,7 +252,6 @@
         }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-150px) scale(0); opacity: 0; } }
 
-        /* MODAL E DVD GIGANTE */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s ease; z-index: 1000; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content { background: linear-gradient(145deg, #1f1f1f, #0a0a0a); width: 1100px; max-width: 95%; height: 600px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 0 150px rgba(0,0,0,1), inset 0 0 50px rgba(0,0,0,0.8); display: flex; position: relative; transform: scale(0.9) translateY(30px); opacity: 0; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
@@ -373,31 +355,6 @@
 
         .footer-credits { text-align: center; padding: 30px; color: #666; font-size: 0.75rem; font-family: 'Montserrat', sans-serif; letter-spacing: 2px; margin-top: auto; position: relative; z-index: 10; text-shadow: 0 2px 4px #000;}
 
-        /* === ÁREA JOGANDO ATUALMENTE === */
-        .playing-highlight {
-            width: 100%; max-width: 1500px; margin: 0 auto 40px auto;
-            background: rgba(20, 15, 10, 0.7);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(212,175,55,0.1);
-            position: relative;
-            z-index: 10;
-            display: none; 
-        }
-        .playing-header {
-            font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.8rem;
-            text-align: center; margin-bottom: 25px; text-shadow: 0 4px 10px rgba(0,0,0,0.8);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 15px;
-        }
-        .playing-shelf {
-            display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; perspective: 1200px;
-        }
-
-        #add-playing-form { display: none; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
-        #add-playing-form input, #add-playing-form select { padding: 10px; background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: 'Montserrat'; }
-
         @media (max-width: 900px) {
             .modal-content, .mural-content { flex-direction: column; height: auto; max-height: 90vh; overflow-y: auto; }
             .modal-image-container, .mural-draw-area { width: 100%; padding: 40px 0; border-right: none; border-bottom: 1px solid #333; }
@@ -408,9 +365,9 @@
             .mural-header { flex-direction: column; text-align: center; }
             .mural-header-info { text-align: center; }
             .mural-actions { flex-direction: row; }
-            .main-header { align-items: center; text-align: center; min-height: 40vh;}
-            h1 { font-size: clamp(2.2rem, 8vw, 3rem); text-align: center; transform-origin: center;}
-            .controls-bar { width: 95%; }
+            .hero-section { align-items: center; height: 50vh; }
+            .hero-title { font-size: clamp(2.5rem, 8vw, 4rem); text-align: center; }
+            .controls-bar { width: 95%; margin-top: 0; }
         }
         @media (max-width: 600px) {
             .game-case-wrapper { width: 140px; height: 200px; margin-top: 15px; margin-bottom: 15px; }
@@ -434,9 +391,9 @@
 <div class="video-overlay"></div>
 <div class="bg-particles"></div>
 
-<header class="main-header">
-    <h1 id="main-title">Jogos Finalizados</h1>
-    <p class="subtitle">A partir de 2025</p>
+<header class="hero-section">
+    <h1 id="main-title" class="hero-title">Jogos Finalizados</h1>
+    <p class="subtitle hero-subtitle">A partir de 2025</p>
 </header>
     
 <div class="controls-bar">
@@ -448,11 +405,6 @@
         <option value="score">Maior Nota</option>
         <option value="az">A - Z</option>
     </select>
-</div>
-
-<div class="playing-highlight" id="playing-section">
-    <h2 class="playing-header">🕹️ Jogando Atualmente</h2>
-    <div class="playing-shelf" id="playing-shelf"></div>
 </div>
 
 <div id="app-status">Conectando ao Banco de Dados...</div>
@@ -529,24 +481,20 @@
         <span style="color: var(--gold); font-weight: bold; font-family: 'Cinzel'; font-size: 1rem; margin-right: 10px;">MODO DEUS ATIVO</span>
         
         <button class="admin-btn" onclick="toggleAddForm()">+ Novo Jogo</button>
-        <button class="admin-btn" style="background: #2b2b2b; color: #fff; border: 1px solid var(--gold);" onclick="toggleAddPlayingForm()">+ Jogando Atual</button>
         <button class="admin-btn danger" onclick="toggleDeleteMode()" id="del-mode-btn">Habilitar Edição</button>
         <button class="admin-btn" onclick="logoutAdmin()" style="background: #333; color: #fff;">Sair</button>
     </div>
-    
     <div id="add-form">
         <input type="text" id="i-title" placeholder="Nome do Jogo" required>
         <input type="text" id="i-cover" placeholder="Link da Capa" required>
         <select id="i-platform">
             <option value="PC">PC</option>
             <option value="Xbox Series X">Xbox Series X</option>
-            <option value="PlayStation 5">PlayStation 5</option>
-            <option value="Nintendo Switch">Nintendo Switch</option>
             <option value="Meta Quest 3">Meta Quest 3</option>
             <option value="Jogo de Tabuleiro">Jogo de Tabuleiro</option>
+            <option value="Nintendo Switch">Nintendo Switch</option>
             <option value="Emulador (PCSX2)">Emulador (PCSX2)</option>
             <option value="Emulador (DuckStation)">Emulador (DuckStation)</option>
-            <option value="Emulador (Outros)">Emulador (Outros)</option>
         </select>
         <input type="number" id="i-score" placeholder="Nota (ex: 9.5)" step="0.1" required>
         <input type="text" id="i-date" placeholder="Data (DD/MM/AAAA)" required>
@@ -554,23 +502,6 @@
         <input type="text" id="i-desc" placeholder="Review / Comentário Curto" style="width: 300px;" required>
         
         <button class="admin-btn" id="btn-save-game" onclick="saveNewGame()">Salvar Jogo na Nuvem</button>
-    </div>
-
-    <div id="add-playing-form">
-        <input type="text" id="p-title" placeholder="Nome do Jogo" required>
-        <input type="text" id="p-cover" placeholder="Link da Capa" required>
-        <select id="p-platform">
-            <option value="PC">PC</option>
-            <option value="Xbox Series X">Xbox Series X</option>
-            <option value="PlayStation 5">PlayStation 5</option>
-            <option value="Nintendo Switch">Nintendo Switch</option>
-            <option value="Meta Quest 3">Meta Quest 3</option>
-            <option value="Jogo de Tabuleiro">Jogo de Tabuleiro</option>
-            <option value="Emulador (PCSX2)">Emulador (PCSX2)</option>
-            <option value="Emulador (DuckStation)">Emulador (DuckStation)</option>
-            <option value="Emulador (Outros)">Emulador (Outros)</option>
-        </select>
-        <button class="admin-btn" id="btn-save-playing" onclick="savePlayingGame()">Salvar Jogo Atual</button>
     </div>
 </div>
 
@@ -581,7 +512,6 @@
 
     let games = [];
     let displayGames = []; 
-    let playingGames = [];
     let isAdmin = false; 
     let deleteMode = false;
     let editTargetId = null; 
@@ -595,75 +525,10 @@
             document.getElementById('app-status').style.display = 'none';
             document.getElementById('library').style.display = 'flex';
             renderLibrary();
-            await loadPlayingGames();
         } catch (err) {
-            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor. Verifique o Supabase.";
+            document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor.";
             document.getElementById('library').style.display = 'flex';
         }
-    }
-
-    async function loadPlayingGames() {
-        try {
-            let { data, error } = await db.from('playing').select('*').order('created_at', { ascending: false });
-            if (error) throw error;
-            playingGames = data || [];
-            renderPlayingGames();
-        } catch (err) {
-            console.error("Erro ao carregar jogos atuais.");
-        }
-    }
-
-    function renderPlayingGames() {
-        const section = document.getElementById('playing-section');
-        const shelf = document.getElementById('playing-shelf');
-        shelf.innerHTML = '';
-
-        if (playingGames.length === 0 && !isAdmin) {
-            section.style.display = 'none';
-            return;
-        }
-        
-        section.style.display = 'block';
-
-        playingGames.forEach((game) => {
-            const wrapper = document.createElement('div'); 
-            wrapper.className = 'game-case-wrapper masterpiece'; 
-            wrapper.style.animation = 'none'; 
-            
-            const shadow = document.createElement('div'); shadow.className = 'case-shadow'; wrapper.appendChild(shadow);
-            const badge = document.createElement('div'); badge.className = 'platform-badge'; badge.innerText = game.platform || "PC";
-            wrapper.appendChild(badge);
-
-            if (isAdmin && deleteMode) {
-                const actionBtns = document.createElement('div'); actionBtns.className = 'action-btns';
-                const delBtn = document.createElement('button'); delBtn.className = 'action-btn delete-btn'; delBtn.innerText = 'X';
-                delBtn.onclick = (e) => { e.stopPropagation(); deletePlayingGame(game.id); };
-                actionBtns.appendChild(delBtn);
-                actionBtns.style.display = 'flex';
-                wrapper.appendChild(actionBtns);
-            }
-
-            const animator = document.createElement('div'); animator.className = 'game-case-animator';
-            const gameCase = document.createElement('div'); gameCase.className = 'game-case';
-            const front = document.createElement('div'); front.className = 'case-face case-front';
-            const img = document.createElement('img'); img.src = game.cover; front.appendChild(img);
-            const side = document.createElement('div'); side.className = 'case-face case-side';
-            side.style.backgroundImage = `url(${game.cover})`; side.style.backgroundSize = 'cover'; side.style.backgroundPosition = 'left center'; 
-            const top = document.createElement('div'); top.className = 'case-face case-top';
-
-            const reflection = document.createElement('div'); reflection.className = 'game-reflection';
-            const refImg = document.createElement('img'); refImg.src = game.cover; reflection.appendChild(refImg);
-
-            for(let i=0; i<3; i++) {
-                const spark = document.createElement('div'); spark.className = 'sparkle';
-                spark.style.left = `${Math.random() * 80 + 10}%`; spark.style.animationDelay = `${Math.random() * 2}s`;
-                animator.appendChild(spark);
-            }
-
-            gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top); gameCase.appendChild(reflection); 
-            animator.appendChild(gameCase); wrapper.appendChild(animator); 
-            shelf.appendChild(wrapper);
-        });
     }
 
     function handleSort() {
@@ -794,13 +659,12 @@
         adminClicks++;
         if(adminClicks === 3) {
             adminClicks = 0; const pwd = prompt("Acesso Restrito:");
-            if(pwd === "nerisadmin") { isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; renderLibrary(); renderPlayingGames(); }
+            if(pwd === "nerisadmin") { isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; renderLibrary(); }
         }
         setTimeout(() => adminClicks = 0, 2000);
     });
 
     function toggleAddForm() {
-        document.getElementById('add-playing-form').style.display = 'none';
         const form = document.getElementById('add-form'); 
         form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
         if(form.style.display === 'flex') {
@@ -808,25 +672,17 @@
             document.getElementById('i-title').value = ''; document.getElementById('i-cover').value = ''; document.getElementById('i-score').value = ''; document.getElementById('i-date').value = ''; document.getElementById('i-desc').value = ''; document.getElementById('i-print').value = '';
         }
     }
-
-    function toggleAddPlayingForm() {
-        document.getElementById('add-form').style.display = 'none';
-        const form = document.getElementById('add-playing-form');
-        form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
-    }
-
     function toggleDeleteMode() {
         deleteMode = !deleteMode; const btn = document.getElementById('del-mode-btn');
         btn.innerText = deleteMode ? "Concluir Edição" : "Habilitar Edição";
         btn.style.background = deleteMode ? "#e63946" : "var(--gold)"; btn.style.color = deleteMode ? "#fff" : "#000";
         renderLibrary();
-        renderPlayingGames();
     }
 
     function startEditGame(game) {
         editTargetId = game.id; 
         document.getElementById('i-title').value = game.title; document.getElementById('i-cover').value = game.cover; document.getElementById('i-platform').value = game.platform; document.getElementById('i-score').value = game.score; document.getElementById('i-date').value = game.date; document.getElementById('i-desc').value = game.review || ''; document.getElementById('i-print').value = game.print || '';
-        document.getElementById('add-form').style.display = 'flex'; document.getElementById('add-playing-form').style.display = 'none'; document.getElementById('btn-save-game').innerText = "💾 Atualizar Banco";
+        document.getElementById('add-form').style.display = 'flex'; document.getElementById('btn-save-game').innerText = "💾 Atualizar Banco";
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
@@ -861,38 +717,7 @@
         }
     }
 
-    async function savePlayingGame() {
-        const title = document.getElementById('p-title').value;
-        const cover = document.getElementById('p-cover').value;
-        const platform = document.getElementById('p-platform').value;
-
-        if(!title || !cover) return;
-
-        const btn = document.getElementById('btn-save-playing');
-        btn.innerText = "Processando..."; btn.disabled = true;
-
-        try {
-            const { error } = await db.from('playing').insert([{ title, cover, platform }]);
-            if(error) throw error;
-            
-            document.getElementById('add-playing-form').style.display = 'none';
-            document.getElementById('p-title').value = '';
-            document.getElementById('p-cover').value = '';
-            await loadPlayingGames();
-        } catch(e) { alert("Erro ao salvar jogo atual."); }
-        btn.innerText = "Salvar Jogo Atual"; btn.disabled = false;
-    }
-
-    async function deletePlayingGame(id) {
-        if(confirm("Remover dos jogos atuais?")) {
-            try {
-                await db.from('playing').delete().eq('id', id);
-                await loadPlayingGames();
-            } catch(e) { alert("Erro na exclusão."); }
-        }
-    }
-
-    function logoutAdmin() { isAdmin = false; deleteMode = false; document.getElementById('admin-panel').style.display = 'none'; renderLibrary(); renderPlayingGames(); }
+    function logoutAdmin() { isAdmin = false; deleteMode = false; document.getElementById('admin-panel').style.display = 'none'; renderLibrary(); }
 
     const canvas = document.getElementById('signature-pad');
     const ctx = canvas.getContext('2d');
