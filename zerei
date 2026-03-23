@@ -173,7 +173,7 @@
         .shelf-row {
             position: relative; width: 100%; min-height: 400px;
             display: flex; justify-content: center; align-items: flex-end;
-            padding-bottom: 25px; border-bottom: 45px solid rgba(28, 17, 9, 0.95);
+            padding-bottom: 25px; border-bottom: 45px solid rgba(28, 17, 9, 0.85);
             box-shadow: 0 25px 40px -10px rgba(0,0,0,0.9), inset 0 -60px 100px rgba(0,0,0,0.8);
             background: linear-gradient(to bottom, transparent, var(--wood-back));
             perspective: 1400px; z-index: 1; transition: box-shadow 0.4s;
@@ -356,6 +356,9 @@
         .admin-btn { background: var(--gold); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: 'Montserrat', sans-serif; transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; }
         .admin-btn.danger { background: #e63946; color: #fff; }
         .admin-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .led-picker { display: flex; align-items: center; gap: 10px; background: #1a1a1a; border: 1px solid #444; padding: 5px 15px; border-radius: 4px; }
+        .led-picker label { color: #aaa; font-family: 'Montserrat'; font-size: 0.8rem; font-weight: bold; }
+        .led-picker input { cursor: pointer; border: none; background: transparent; width: 30px; height: 30px; padding: 0; }
         #add-form { display: none; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
         #add-form input, #add-form select { padding: 10px; background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: 'Montserrat'; }
         
@@ -379,7 +382,7 @@
             .mural-header-info { text-align: center; }
             .mural-actions { flex-direction: row; }
             .hero-section { align-items: center; height: 50vh; }
-            .hero-title { font-size: clamp(2.5rem, 8vw, 4rem); text-align: center; }
+            h1 { font-size: clamp(2.5rem, 8vw, 4rem); text-align: center; }
             .controls-bar { width: 95%; margin-top: 0; }
         }
         @media (max-width: 600px) {
@@ -405,8 +408,8 @@
 <div class="bg-particles"></div>
 
 <header class="hero-section">
-    <h1 id="main-title" class="hero-title">Jogos Finalizados</h1>
-    <p class="subtitle hero-subtitle">A partir de 2025</p>
+    <h1 id="main-title">Jogos Finalizados</h1>
+    <p class="subtitle">A partir de 2025</p>
 </header>
     
 <div class="controls-bar">
@@ -492,7 +495,6 @@
 <div id="admin-panel">
     <div class="admin-controls">
         <span style="color: var(--gold); font-weight: bold; font-family: 'Cinzel'; font-size: 1rem; margin-right: 10px;">MODO DEUS ATIVO</span>
-        
         <button class="admin-btn" onclick="toggleAddForm()">+ Novo Jogo</button>
         <button class="admin-btn danger" onclick="toggleDeleteMode()" id="del-mode-btn">Habilitar Edição</button>
         <button class="admin-btn" onclick="logoutAdmin()" style="background: #333; color: #fff;">Sair</button>
@@ -503,13 +505,11 @@
         <select id="i-platform">
             <option value="PC">PC</option>
             <option value="Xbox Series X">Xbox Series X</option>
-            <option value="PlayStation 5">PlayStation 5</option>
-            <option value="Nintendo Switch">Nintendo Switch</option>
             <option value="Meta Quest 3">Meta Quest 3</option>
             <option value="Jogo de Tabuleiro">Jogo de Tabuleiro</option>
-            <option value="Emulador (PCSX2)">Emulador (PCSX2)</option>
-            <option value="Emulador (DuckStation)">Emulador (DuckStation)</option>
-            <option value="Emulador (Outros)">Emulador (Outros)</option>
+            <option value="Nintendo Switch">Nintendo Switch</option>
+            <option value="Nintendo Switch">Pcsx2</option>
+            <option value="Nintendo Switch">Duckstation</option>
         </select>
         <input type="number" id="i-score" placeholder="Nota (ex: 9.5)" step="0.1" required>
         <input type="text" id="i-date" placeholder="Data (DD/MM/AAAA)" required>
@@ -530,6 +530,12 @@
     let isAdmin = false; 
     let deleteMode = false;
     let editTargetId = null; 
+    
+    let ledState = { isOn: true, color: '#00e5ff' };
+    try {
+        const savedLed = localStorage.getItem('nerisLedState');
+        if (savedLed) ledState = JSON.parse(savedLed);
+    } catch(e) {}
 
     async function initApp() {
         try {
@@ -544,6 +550,33 @@
             document.getElementById('app-status').innerText = "⚠️ Erro de conexão com o servidor.";
             document.getElementById('library').style.display = 'flex';
         }
+    }
+
+    function {
+        document.documentElement.style.setProperty('--led-color', ledState.color);
+        const btn = document.getElementById('btn-led');
+        const rows = document.querySelectorAll('.shelf-row');
+        if (ledState.isOn) {
+            btn.classList.add('active'); btn.innerHTML = '💡 LEDs: ON';
+            rows.forEach(row => row.classList.add('led-active'));
+        } else {
+            btn.classList.remove('active'); btn.innerHTML = '💡 LEDs: OFF';
+            rows.forEach(row => row.classList.remove('led-active'));
+        }
+        const picker = document.getElementById('i-led-color');
+        if(picker) picker.value = ledState.color;
+    }
+    
+    function toggleLED() { 
+        ledState.isOn = !ledState.isOn; 
+        try { localStorage.setItem('nerisLedState', JSON.stringify(ledState)); } catch(e){}
+        applyLEDState(); 
+    }
+    
+    function updateLEDColor(color) { 
+        ledState.color = color; 
+        try { localStorage.setItem('nerisLedState', JSON.stringify(ledState)); } catch(e){}
+        applyLEDState(); 
     }
 
     function handleSort() {
@@ -575,10 +608,7 @@
                 shelfRow.appendChild(shelfContent); library.appendChild(shelfRow);
             }
 
-            const wrapper = document.createElement('div'); 
-            wrapper.className = 'game-case-wrapper';
-            wrapper.style.animationDelay = `${(index % capacity) * 0.1}s`;
-
+            const wrapper = document.createElement('div'); wrapper.className = 'game-case-wrapper';
             if (parseFloat(game.score) === 10) wrapper.classList.add('masterpiece');
 
             const shadow = document.createElement('div'); shadow.className = 'case-shadow'; wrapper.appendChild(shadow);
@@ -617,6 +647,8 @@
             gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top); gameCase.appendChild(reflection); 
             animator.appendChild(gameCase); wrapper.appendChild(animator); wrapper.appendChild(actionBtns); shelfContent.appendChild(wrapper);
         });
+        
+        applyLEDState();
     }
 
     const modal = document.getElementById('modal');
