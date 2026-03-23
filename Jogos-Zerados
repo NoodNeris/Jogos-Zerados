@@ -647,8 +647,6 @@
             gameCase.appendChild(front); gameCase.appendChild(side); gameCase.appendChild(top); gameCase.appendChild(reflection); 
             animator.appendChild(gameCase); wrapper.appendChild(animator); wrapper.appendChild(actionBtns); shelfContent.appendChild(wrapper);
         });
-        
-        applyLEDState();
     }
 
     const modal = document.getElementById('modal');
