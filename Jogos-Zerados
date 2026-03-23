@@ -552,34 +552,7 @@
         }
     }
 
-    function {
-        document.documentElement.style.setProperty('--led-color', ledState.color);
-        const btn = document.getElementById('btn-led');
-        const rows = document.querySelectorAll('.shelf-row');
-        if (ledState.isOn) {
-            btn.classList.add('active'); btn.innerHTML = '💡 LEDs: ON';
-            rows.forEach(row => row.classList.add('led-active'));
-        } else {
-            btn.classList.remove('active'); btn.innerHTML = '💡 LEDs: OFF';
-            rows.forEach(row => row.classList.remove('led-active'));
-        }
-        const picker = document.getElementById('i-led-color');
-        if(picker) picker.value = ledState.color;
-    }
-    
-    function toggleLED() { 
-        ledState.isOn = !ledState.isOn; 
-        try { localStorage.setItem('nerisLedState', JSON.stringify(ledState)); } catch(e){}
-        applyLEDState(); 
-    }
-    
-    function updateLEDColor(color) { 
-        ledState.color = color; 
-        try { localStorage.setItem('nerisLedState', JSON.stringify(ledState)); } catch(e){}
-        applyLEDState(); 
-    }
-
-    function handleSort() {
+       function handleSort() {
         const sortType = document.getElementById('sort-select').value;
         if (sortType === 'recent') displayGames = [...games];
         else if (sortType === 'score') displayGames.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
